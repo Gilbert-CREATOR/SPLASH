@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Perfil de Usuario</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      margin: 0;
+      padding: 0;
+      color: #000;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 30px;
+      border: 1px solid #000;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .nav button {
+      background: none;
+      color: #000;
+      border: 1px solid #000;
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+
+    .nav button:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    .profile-info, .edit-form, .change-password, .activity-log {
+      display: none;
+    }
+
+    .active {
+      display: block;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #000;
+    }
+
+    .profile-pic {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .profile-pic img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border: 1px solid #000;
+    }
+
+    .activity-log ul {
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Perfil de Usuario</h2>
+
+  <div class="nav">
+    <button onclick="showSection('profile-info')">Ver Perfil</button>
+    <button onclick="showSection('edit-form')">Editar Perfil</button>
+    <button onclick="showSection('change-password')">Cambiar Contraseña</button>
+    <button onclick="showSection('activity-log')">Historial</button>
+  </div>
+
+  <!-- Ver Perfil -->
+  <div id="profile-info" class="profile-info active">
+    <div class="profile-pic">
+      <img src="https://via.placeholder.com/120" alt="Foto de perfil">
+    </div>
+    <p><strong>Nombre:</strong> Juan Pérez</p>
+    <p><strong>Email:</strong> juanperez@email.com</p>
+    <p><strong>Rol:</strong> Usuario registrado</p>
+  </div>
+
+  <!-- Editar Perfil -->
+  <div id="edit-form" class="edit-form">
+    <form>
+      <label for="name">Nombre</label>
+      <input type="text" id="name" value="Juan Pérez">
+
+      <label for="email">Correo Electrónico</label>
+      <input type="email" id="email" value="juanperez@email.com">
+
+      <label for="photo">Foto de perfil</label>
+      <input type="file" id="photo">
+
+      <br><br>
+      <button type="submit">Guardar Cambios</button>
+    </form>
+  </div>
+
+  <!-- Cambiar Contraseña -->
+  <div id="change-password" class="change-password">
+    <form>
+      <label for="current-password">Contraseña actual</label>
+      <input type="password" id="current-password">
+
+      <label for="new-password">Nueva contraseña</label>
+      <input type="password" id="new-password">
+
+      <label for="confirm-password">Confirmar nueva contraseña</label>
+      <input type="password" id="confirm-password">
+
+      <br><br>
+      <button type="submit">Cambiar Contraseña</button>
+    </form>
+  </div>
+
+  <!-- Historial -->
+  <div id="activity-log" class="activity-log">
+    <ul>
+      <li>Inició sesión el 20 de mayo</li>
+      <li>Editó su perfil el 15 de mayo</li>
+      <li>Cambió su contraseña el 1 de mayo</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  function showSection(sectionId) {
+    const sections = document.querySelectorAll('.profile-info, .edit-form, .change-password, .activity-log');
+    sections.forEach(section => section.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+  }
+</script>
+
+</body>
+</html>
