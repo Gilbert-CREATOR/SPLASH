@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B&B Car Wash - Sistema de Gestión</title>
+    <meta name="description" content="Sistema completo de gestión para lavado de autos a domicilio">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #ffd700;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card p {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+        
+        .demo-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .demo-section h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+        
+        .demo-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .demo-link {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .demo-link i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .tech-stack {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .tech-stack h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .tech-badges {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            opacity: 0.8;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚗 B&B Car Wash</h1>
+            <p class="subtitle">
+                Sistema moderno de gestión para lavado de autos a domicilio
+            </p>
+        </header>
+        
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>100% Responsivo</h3>
+                <p>Diseño adaptativo para todos los dispositivos móviles y desktop</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3>UI/UX Moderna</h3>
+                <p>Interfaz elegante con temas claro/oscuro y animaciones suaves</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Alto Rendimiento</h3>
+                <p>Código optimizado para carga rápida y experiencia fluida</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔐</div>
+                <h3>Seguridad</h3>
+                <p>Sistema de autenticación robusto con roles de usuario</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Gestión Completa</h3>
+                <p>Control total de citas, empleados, servicios y facturación</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">☕</div>
+                <h3>Cafetería</h3>
+                <p>Sistema integrado de gestión de pedidos y stock</p>
+            </div>
+        </section>
+        
+        <section class="demo-section">
+            <h2>🚀 Acceso al Sistema</h2>
+            <div class="demo-links">
+                <a href="/admin/" class="demo-link">
+                    <i class="fas fa-user-shield"></i>
+                    <strong>Panel Admin</strong>
+                    <p>Gestión completa</p>
+                </a>
+                
+                <a href="#" class="demo-link" onclick="alert('Demo: Inicio del sistema'); return false;">
+                    <i class="fas fa-home"></i>
+                    <strong>Página Principal</strong>
+                    <p>Vista pública</p>
+                </a>
+                
+                <a href="#" class="demo-link" onclick="alert('Demo: Agendar cita'); return false;">
+                    <i class="fas fa-calendar"></i>
+                    <strong>Agendar Cita</strong>
+                    <p>Reserva de servicios</p>
+                </a>
+                
+                <a href="#" class="demo-link" onclick="alert('Demo: Dashboard empleado'); return false;">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <strong>Dashboard</strong>
+                    <p>Panel de control</p>
+                </a>
+            </div>
+        </section>
+        
+        <section class="tech-stack">
+            <h2>🛠️ Stack Tecnológico</h2>
+            <div class="tech-badges">
+                <span class="badge">Django 4.2</span>
+                <span class="badge">Python 3.9</span>
+                <span class="badge">HTML5</span>
+                <span class="badge">CSS3</span>
+                <span class="badge">JavaScript</span>
+                <span class="badge">SQLite</span>
+                <span class="badge">Bootstrap</span>
+                <span class="badge">Font Awesome</span>
+            </div>
+        </section>
+        
+        <footer>
+            <p>&​copy; 2024 B&B Car Wash - Desarrollado con ❤️ por Gilbert-CREATOR</p>
+            <p>
+                <a href="https://github.com/Gilbert-CREATOR/carwash" style="color: #ffd700; text-decoration: none;">
+                    <i class="fab fa-github"></i> GitHub Repository
+                </a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
