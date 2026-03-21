@@ -311,15 +311,20 @@ jobs:
         </html>
         EOF
       
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      
     - name: Verify index.html was created
       run: |
         ls -la index.html
         head -5 index.html
         echo "File size:"
         wc -l index.html
+        echo "=== File content preview ==="
+        grep -o '<title>.*</title>' index.html || echo "Title not found"
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: '.'
+        retention-days: 1
 
   deploy:
     environment:
