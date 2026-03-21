@@ -319,6 +319,8 @@ jobs:
         wc -l index.html
         echo "=== File content preview ==="
         grep -o '<title>.*</title>' index.html || echo "Title not found"
+        echo "=== Directory listing ==="
+        ls -la | head -10
       
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
