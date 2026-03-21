@@ -313,9 +313,11 @@ jobs:
       
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
-      with:
-        path: '.'
-        retention-days: 1
+      
+    - name: Verify index.html was created
+      run: |
+        ls -la index.html
+        head -5 index.html
 
   deploy:
     environment:
