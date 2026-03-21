@@ -2,274 +2,585 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="30">
-    <title>B&B Car Wash - Sistema de Gestión</title>
-    <meta name="description" content="Sistema completo de gestión para lavado de autos a domicilio">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>Inicio · B&B Car Wash</title>
+
+    <!-- CSS CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
+        /* ===== THEME GLOBAL ===== */
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #ffd700;
+            --text-primary: #ffffff;
+            --text-secondary: #b8c5d6;
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-card: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             min-height: 100vh;
-            color: white;
+            color: var(--text-primary);
+            line-height: 1.6;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
+
+        /* ===== NAVBAR ===== */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
         }
-        
-        header {
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .nav-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .nav-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-primary);
+            margin: 3px 0;
+            transition: var(--transition);
+        }
+
+        /* ===== HERO SECTION ===== */
+        #inicio {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            margin-bottom: 3rem;
+            padding: 2rem;
+            padding-top: 80px;
         }
-        
-        h1 {
-            font-size: 3rem;
+
+        .pagina-inicio {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .hero {
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: bold;
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: var(--accent-color);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
         }
-        
-        .features {
+
+        .hero h2 .eco {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            border-color: var(--accent-color);
+        }
+
+        .btn-secondary {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: transparent;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            border: 2px solid var(--accent-color);
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-color);
+            color: var(--bg-primary);
+            transform: translateY(-2px);
+        }
+
+        /* ===== INTRO SECTION ===== */
+        .intro {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin-bottom: 4rem;
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .intro h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .intro p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .intro-img {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        /* ===== SERVICIOS SECTION ===== */
+        .servicios-section {
+            margin-bottom: 4rem;
+        }
+
+        .servicios-section h2 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            color: var(--accent-color);
+        }
+
+        .servicios-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
-            margin-bottom: 3rem;
         }
-        
-        .feature-card {
-            background: rgba(255, 255, 255, 0.1);
+
+        .servicio-card {
+            background: var(--bg-card);
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 2rem;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.3s ease;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
         }
-        
-        .feature-card:hover {
+
+        .servicio-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
         }
-        
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: #ffd700;
-        }
-        
-        .feature-card h3 {
+
+        .servicio-card h3 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
+            color: var(--accent-color);
         }
-        
-        .feature-card p {
-            opacity: 0.8;
-            line-height: 1.6;
+
+        .precio-line {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
         }
-        
-        .demo-section {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 2rem;
-            margin-bottom: 3rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .demo-section h2 {
-            text-align: center;
+
+        .desc {
+            color: var(--text-secondary);
             margin-bottom: 2rem;
-            font-size: 2rem;
         }
-        
-        .demo-links {
+
+        /* ===== HERO FOOTER ===== */
+        .hero-footer {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin-bottom: 4rem;
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            border: 1px solid var(--border-color);
         }
-        
-        .demo-link {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            padding: 1.5rem;
+
+        .hero-footer__img-wrapper {
             text-align: center;
-            text-decoration: none;
-            color: white;
-            transition: all 0.3s ease;
         }
-        
-        .demo-link:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+
+        .hero-footer__img {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
         }
-        
-        .demo-link i {
+
+        .hero-footer__card h3 {
             font-size: 2rem;
-            margin-bottom: 0.5rem;
-            display: block;
+            margin-bottom: 1.5rem;
+            color: var(--accent-color);
         }
-        
-        .tech-stack {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        
-        .tech-stack h2 {
-            font-size: 2rem;
+
+        .hero-footer__card p {
+            font-size: 1.1rem;
             margin-bottom: 2rem;
+            color: var(--text-secondary);
         }
-        
-        .tech-badges {
+
+        .hero-footer__actions {
             display: flex;
-            justify-content: center;
             gap: 1rem;
             flex-wrap: wrap;
         }
-        
-        .badge {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 25px;
-            padding: 0.5rem 1.5rem;
-            font-size: 0.9rem;
-        }
-        
-        footer {
+
+        /* ===== REDES SOCIALES ===== */
+        .redes-section {
             text-align: center;
-            padding: 2rem;
-            opacity: 0.8;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 4rem;
         }
-        
+
+        .redes-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--accent-color);
+        }
+
+        .redes {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .redes button {
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .redes a {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background: var(--bg-card);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            border: 2px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .redes a:hover {
+            background: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .redes img {
+            width: 30px;
+            height: 30px;
+            filter: brightness(0) invert(1);
+        }
+
+        /* ===== FOOTER TEXT ===== */
+        #final {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            padding: 0 2rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
+            .nav-toggle {
+                display: flex;
             }
-            
-            .container {
-                padding: 1rem;
+
+            .hero h1 {
+                font-size: 3rem;
             }
-            
-            .features {
+
+            .hero h2 {
+                font-size: 1.8rem;
+            }
+
+            .intro {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 2rem;
+            }
+
+            .hero-footer {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 2rem;
+            }
+
+            .servicios-grid {
                 grid-template-columns: 1fr;
             }
+
+            .hero-footer__actions {
+                justify-content: center;
+            }
+
+            .redes {
+                gap: 1rem;
+            }
+
+            .pagina-inicio {
+                padding: 1rem;
+            }
+
+            #inicio {
+                padding-top: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero h2 {
+                font-size: 1.5rem;
+            }
+
+            .btn-primary, .btn-secondary {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero, .intro, .servicios-section, .hero-footer, .redes-section {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        /* ===== PLACEHOLDER IMAGES ===== */
+        .intro-img, .hero-footer__img {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            text-align: center;
+            min-height: 300px;
+            border-radius: 15px;
+        }
+
+        .intro-img::before {
+            content: "🚗 Imagen BMW";
+        }
+
+        .hero-footer__img::before {
+            content: "🏎️ Imagen Ferrari";
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🚗 B&B Car Wash</h1>
-            <p class="subtitle">
-                Sistema moderno de gestión para lavado de autos a domicilio
-            </p>
-        </header>
-        
-        <section class="features">
-            <div class="feature-card">
-                <div class="feature-icon">📱</div>
-                <h3>100% Responsivo</h3>
-                <p>Diseño adaptativo para todos los dispositivos móviles y desktop</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">🎨</div>
-                <h3>UI/UX Moderna</h3>
-                <p>Interfaz elegante con temas claro/oscuro y animaciones suaves</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3>Alto Rendimiento</h3>
-                <p>Código optimizado para carga rápida y experiencia fluida</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">🔐</div>
-                <h3>Seguridad</h3>
-                <p>Sistema de autenticación robusto con roles de usuario</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <h3>Gestión Completa</h3>
-                <p>Control total de citas, empleados, servicios y facturación</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">☕</div>
-                <h3>Cafetería</h3>
-                <p>Sistema integrado de gestión de pedidos y stock</p>
-            </div>
-        </section>
-        
-        <section class="demo-section">
-            <h2>🚀 Acceso al Sistema</h2>
-            <div class="demo-links">
-                <a href="/admin/" class="demo-link">
-                    <i class="fas fa-user-shield"></i>
-                    <strong>Panel Admin</strong>
-                    <p>Gestión completa</p>
-                </a>
+    <header class="site-header">
+        <nav class="navbar">
+            <a href="#" class="nav-brand">🚗 B&B Car Wash</a>
+            <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <section id="inicio">
+        <div class="pagina-inicio container">
+            <!-- HERO -->
+            <section class="hero">
+                <h1 id="nombre">B&B</h1>
+                <h2>CAR WASH A DOMICILIO Y <span class="eco">ECO-FRIENDLY</span> PARA TU VEHÍCULO</h2>
+                <h2>Lavado y Encerado - Wash & Wax</h2>
+                <a href="#servicios" class="btn-primary">Agendar Cita</a>
+            </section>
+
+            <!-- INTRO -->
+            <section class="intro">
+                <div>
+                    <h3>TE AYUDAMOS A MANTENER TU COCHE SIEMPRE LIMPIO</h3>
+                    <p>En B&B Car Wash, nos especializamos en ofrecer servicios de lavado de coches a domicilio que son tanto convenientes como respetuosos con el medio ambiente. Nuestro equipo de profesionales capacitados utiliza productos ecológicos y técnicas avanzadas para garantizar que tu vehículo reciba el mejor cuidado posible sin dañar el planeta.</p>
+                </div>
+                <div class="intro-img" alt="Car Wash Image 1"></div>
+            </section>
+
+            <!-- SERVICIOS -->
+            <section id="servicios" class="servicios-section">
+                <h2>NUESTROS SERVICIOS</h2>
                 
-                <a href="http://localhost:8000/inicio/" class="demo-link">
-                    <i class="fas fa-home"></i>
-                    <strong>Página Principal</strong>
-                    <p>Ir al inicio del sistema</p>
-                </a>
-                
-                <a href="http://localhost:8000/agendar-cita/" class="demo-link">
-                    <i class="fas fa-calendar"></i>
-                    <strong>Agendar Cita</strong>
-                    <p>Reservar servicios</p>
-                </a>
-                
-                <a href="http://localhost:8000/dashboard/" class="demo-link">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <strong>Dashboard</strong>
-                    <p>Panel de control</p>
-                </a>
-            </div>
-        </section>
-        
-        <section class="tech-stack">
-            <h2>🛠️ Stack Tecnológico</h2>
-            <div class="tech-badges">
-                <span class="badge">Django 4.2</span>
-                <span class="badge">Python 3.9</span>
-                <span class="badge">HTML5</span>
-                <span class="badge">CSS3</span>
-                <span class="badge">JavaScript</span>
-                <span class="badge">SQLite</span>
-                <span class="badge">Bootstrap</span>
-                <span class="badge">Font Awesome</span>
-            </div>
-        </section>
-        
-        <footer>
-            <p>&copy; 2024 B&B Car Wash - Desarrollado con ❤️ por Gilbert-CREATOR</p>
-            <p>
-                <a href="https://github.com/Gilbert-CREATOR/carwash" style="color: #ffd700; text-decoration: none;">
-                    <i class="fab fa-github"></i> GitHub Repository
-                </a>
-            </p>
-        </footer>
-    </div>
+                <div class="servicios-grid">
+                    <div class="servicio-card">
+                        <h3>Lavado Básico</h3>
+                        <p class="precio-line">RD$ 500</p>
+                        <p class="desc">Lavado exterior completo con productos eco-friendly.</p>
+                        <a href="#contacto" class="btn-primary">Agendar Cita</a>
+                    </div>
+                    
+                    <div class="servicio-card">
+                        <h3>Lavado Premium</h3>
+                        <p class="precio-line">RD$ 800</p>
+                        <p class="desc">Lavado completo interior y exterior con cera premium.</p>
+                        <a href="#contacto" class="btn-primary">Agendar Cita</a>
+                    </div>
+                    
+                    <div class="servicio-card">
+                        <h3>Detailing Completo</h3>
+                        <p class="precio-line">RD$ 1500</p>
+                        <p class="desc">Servicio completo de detailing y protección.</p>
+                        <a href="#contacto" class="btn-primary">Agendar Cita</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN DEL CARRO BLANCO -->
+            <section class="hero-footer">
+                <div class="hero-footer__img-wrapper">
+                    <div class="hero-footer__img" alt="Auto de lujo"></div>
+                </div>
+
+                <div class="hero-footer__card">
+                    <h3>¿Listo para tu lavado?</h3>
+                    <p>Llámanos o agenda tu cita ahora. Servicio a domicilio y productos <span class="eco">eco-friendly.</span></p>
+
+                    <div id="contacto" class="hero-footer__actions">
+                        <a href="tel:+18494262623" class="btn-primary">Llamar</a>
+                        <a href="#servicios" class="btn-secondary">Agendar</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- REDES -->
+            <section class="redes-section">
+                <h2>SÍGUENOS EN LAS REDES</h2>
+                <div class="redes">
+                    <button>
+                        <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-facebook-f" style="color: white; font-size: 24px;"></i>
+                        </a>
+                    </button>
+                    <button>
+                        <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-instagram" style="color: white; font-size: 24px;"></i>
+                        </a>
+                    </button>
+                </div>
+            </section>
+
+            <p id="final">En B&B Car Wash, estamos comprometidos con la excelencia y la satisfacción del cliente. Permítenos cuidar de tu vehículo mientras tú te ocupas de tus actividades diarias.</p>
+            <h2 style="text-align: center; color: var(--accent-color); margin-bottom: 3rem;">¡Gracias por elegir B&B Car Wash!</h2>
+        </div>
+    </section>
+
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Mobile navigation toggle
+        const navToggle = document.getElementById('nav-toggle');
+        if (navToggle) {
+            navToggle.addEventListener('click', function() {
+                // Placeholder for mobile menu functionality
+                console.log('Mobile menu toggle clicked');
+            });
+        }
+
+        // Add scroll animations
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.site-header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(26, 26, 46, 0.98)';
+            } else {
+                header.style.background = 'rgba(26, 26, 46, 0.95)';
+            }
+        });
+    </script>
 </body>
 </html>
