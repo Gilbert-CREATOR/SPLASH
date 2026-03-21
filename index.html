@@ -1,274 +1,141 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B&B Car Wash - Sistema de Gestión</title>
-    <meta name="description" content="Sistema completo de gestión para lavado de autos a domicilio">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-        
-        .feature-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 2rem;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.3s ease;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: #ffd700;
-        }
-        
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .feature-card p {
-            opacity: 0.8;
-            line-height: 1.6;
-        }
-        
-        .demo-section {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 2rem;
-            margin-bottom: 3rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .demo-section h2 {
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 2rem;
-        }
-        
-        .demo-links {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-        
-        .demo-link {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            padding: 1.5rem;
-            text-align: center;
-            text-decoration: none;
-            color: white;
-            transition: all 0.3s ease;
-        }
-        
-        .demo-link:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        .demo-link i {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-        
-        .tech-stack {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        
-        .tech-stack h2 {
-            font-size: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .tech-badges {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        
-        .badge {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 25px;
-            padding: 0.5rem 1.5rem;
-            font-size: 0.9rem;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 2rem;
-            opacity: 0.8;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .container {
-                padding: 1rem;
-            }
-            
-            .features {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>🚗 B&B Car Wash</h1>
-            <p class="subtitle">
-                Sistema moderno de gestión para lavado de autos a domicilio
-            </p>
-        </header>
-        
-        <section class="features">
-            <div class="feature-card">
-                <div class="feature-icon">📱</div>
-                <h3>100% Responsivo</h3>
-                <p>Diseño adaptativo para todos los dispositivos móviles y desktop</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">🎨</div>
-                <h3>UI/UX Moderna</h3>
-                <p>Interfaz elegante con temas claro/oscuro y animaciones suaves</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3>Alto Rendimiento</h3>
-                <p>Código optimizado para carga rápida y experiencia fluida</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">🔐</div>
-                <h3>Seguridad</h3>
-                <p>Sistema de autenticación robusto con roles de usuario</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <h3>Gestión Completa</h3>
-                <p>Control total de citas, empleados, servicios y facturación</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">☕</div>
-                <h3>Cafetería</h3>
-                <p>Sistema integrado de gestión de pedidos y stock</p>
-            </div>
-        </section>
-        
-        <section class="demo-section">
-            <h2>🚀 Acceso al Sistema</h2>
-            <div class="demo-links">
-                <a href="/admin/" class="demo-link">
-                    <i class="fas fa-user-shield"></i>
-                    <strong>Panel Admin</strong>
-                    <p>Gestión completa</p>
-                </a>
-                
-                <a href="http://localhost:8000/inicio/" class="demo-link">
-    <i class="fas fa-home"></i>
-    <strong>Página Principal</strong>
-    <p>Ir al inicio del sistema</p>
-</a>
+{% extends "layouts/app.html" %}
 
-<a href="http://localhost:8000/agendar-cita/" class="demo-link">
-    <i class="fas fa-calendar"></i>
-    <strong>Agendar Cita</strong>
-    <p>Reservar servicios</p>
-</a>
+{% load static %}
 
-<a href="http://localhost:8000/dashboard/" class="demo-link">
-    <i class="fas fa-tachometer-alt"></i>
-    <strong>Dashboard</strong>
-    <p>Panel de control</p>
-</a>
-            </div>
-        </section>
-        
-        <section class="tech-stack">
-            <h2>🛠️ Stack Tecnológico</h2>
-            <div class="tech-badges">
-                <span class="badge">Django 4.2</span>
-                <span class="badge">Python 3.9</span>
-                <span class="badge">HTML5</span>
-                <span class="badge">CSS3</span>
-                <span class="badge">JavaScript</span>
-                <span class="badge">SQLite</span>
-                <span class="badge">Bootstrap</span>
-                <span class="badge">Font Awesome</span>
-            </div>
-        </section>
-        
-        <footer>
-            <p>&​copy; 2024 B&B Car Wash - Desarrollado con ❤️ por Gilbert-CREATOR</p>
-            <p>
-                <a href="https://github.com/Gilbert-CREATOR/carwash" style="color: #ffd700; text-decoration: none;">
-                    <i class="fab fa-github"></i> GitHub Repository
-                </a>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/inicio.css' %}">
+{% endblock %}
+
+{% block title %}Inicio · B&B Car Wash{% endblock %}
+
+{% block content %}
+<section id="inicio">
+    <!-- contenido del hero -->
+</section>
+<div class="pagina-inicio container">
+
+    <!-- HERO -->
+    <section class="hero">
+        <h1 id="nombre">B&B</h1>
+        <h2>CAR WASH A DOMICILIO Y <span class="eco">ECO-FRIENDLY</span> PARA TU VEHÍCULO</h2>
+        <h2>Lavado y Encerado - Wash & Wax</h2>
+        <a href="{% url 'agendar_cita' %}" class="btn-primary">Agendar Cita</a>
+    </section>
+
+
+    <!-- INTRO -->
+    <section class="intro">
+        <h3>TE AYUDAMOS A MANTENER TU COCHE SIEMPRE LIMPIO</h3>
+        <p>En B&B Car Wash, nos especializamos en ofrecer servicios de lavado de coches a domicilio que son tanto convenientes como respetuosos con el medio ambiente. Nuestro equipo de profesionales capacitados utiliza productos ecológicos y técnicas avanzadas para garantizar que tu vehículo reciba el mejor cuidado posible sin dañar el planeta.</p>
+        <img src="{% static 'img/bmw.jpg' %}" alt="Car Wash Image 1" class="intro-img" data-theme-dark="{% static 'img/bmw.jpg' %}" data-theme-light="{% static 'img/BMW_blanco.png' %}">
+    </section>
+
+
+    <!-- SERVICIOS -->
+    <section id="tarifa" class="servicios-section">
+    <h2>NUESTROS SERVICIOS</h2>
+    
+    <div class="servicios-grid">
+
+    {% for servicio in servicios %}
+        <div class="servicio-card">
+            <h3>{{ servicio.nombre }}</h3>
+
+            <p class="precio-line">
+                RD$ {{ servicio.precio }}
             </p>
-        </footer>
-    </div>
-</body>
-</html>
+
+            <p class="desc">
+                {{ servicio.descripcion }}
+            </p>
+
+            <a href="{% url 'agendar_cita' %}?servicio={{ servicio.id }}" class="btn-primary">
+                Agendar Cita
+            </a>
+        </div>
+    {% empty %}
+        <p>No hay servicios disponibles.</p>
+    {% endfor %}
+
+</div>
+
+</section>
+
+
+
+    <!-- SECCIÓN DEL CARRO BLANCO -->
+    <section class="hero-footer">
+        <div class="hero-footer__img-wrapper">
+            <img src="{% static 'img/ferrari.jpg' %}" alt="Auto blanco" class="hero-footer__img" data-theme-dark="{% static 'img/ferrari.jpg' %}" data-theme-light="{% static 'img/ferrari_blanco.png' %}">
+        </div>
+
+        <div class="hero-footer__card">
+            <h3>¿Listo para tu lavado?</h3>
+            <p>Llámanos o agenda tu cita ahora. Servicio a domicilio y productos <span class="eco"> eco-friendly.</span></p>
+
+            <div id="Contacto" class="hero-footer__actions">
+                <a href="tel:+18494262623" class="btn-primary">Llamar</a>
+                <a href="{% url 'agendar_cita' %}" class="btn-secondary">Agendar</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- REDES -->
+    <section class="redes-section">
+        <h2>SÍGUENOS EN LAS REDES</h2>
+        <div class="redes">
+        <button> <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer"> 
+        <img src="{% static 'img/facebook.svg' %}" alt="Facebook"> </a> </button>
+
+        <button> <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer"> 
+        <img src="{% static 'img/instagram.svg' %}" alt="Instagram"> </a> </button>
+</div>
+    </section>
+
+    <p id="final">En B&B Car Wash, estamos comprometidos con la excelencia y la satisfacción del cliente. Permítenos cuidar de tu vehículo mientras tú te ocupas de tus actividades diarias.</p>
+    <h2>¡Gracias por elegir B&B Car Wash!</h2>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+(function() {
+    // Función para actualizar imágenes según el tema
+    function updateThemeImages() {
+        const currentTheme = document.body.getAttribute('data-theme');
+        const themeImages = document.querySelectorAll('[data-theme-dark][data-theme-light]');
+        
+        themeImages.forEach(img => {
+            const darkSrc = img.getAttribute('data-theme-dark');
+            const lightSrc = img.getAttribute('data-theme-light');
+            
+            if (currentTheme === 'light' && lightSrc) {
+                img.src = lightSrc;
+            } else if (currentTheme === 'dark' && darkSrc) {
+                img.src = darkSrc;
+            }
+        });
+    }
+    
+    // Actualizar imágenes al cargar la página
+    updateThemeImages();
+    
+    // Escuchar cambios en el tema
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                updateThemeImages();
+            }
+        });
+    });
+    
+    observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['data-theme']
+    });
+})();
+</script>
+{% endblock %}
