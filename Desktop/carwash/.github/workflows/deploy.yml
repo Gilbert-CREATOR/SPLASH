@@ -318,6 +318,8 @@ jobs:
       run: |
         ls -la index.html
         head -5 index.html
+        echo "File size:"
+        wc -l index.html
 
   deploy:
     environment:
