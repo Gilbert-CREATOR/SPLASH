@@ -1,0 +1,237 @@
+/* =========================
+   CONTENEDOR GENERAL
+========================= */
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* =========================
+   TITULOS
+========================= */
+
+h2 {
+    font-size: 38px;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+}
+
+h3 {
+    font-size: 26px;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card {
+    background: var(--bg-card);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    transition: all 0.35s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 18px;
+}
+
+.card-body {
+    padding: 25px;
+}
+
+/* =========================
+   FORMULARIOS
+========================= */
+
+form input,
+form select {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 10px 12px;
+    color: var(--text-primary);
+    outline: none;
+    transition: 0.3s;
+}
+
+form input:focus,
+form select:focus {
+    border-color: var(--accent);
+}
+
+/* =========================
+   BOTONES
+========================= */
+
+.btn {
+    border-radius: 12px;
+    padding: 8px 18px;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: var(--accent);
+    color: var(--accent-hover);
+}
+
+.btn-success {
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    transition: 0.3s ease;
+}
+
+.btn-success:hover {
+    background: var(--accent);
+    color: var(--accent-hover);
+}
+
+.btn-danger {
+    background: transparent;
+    border: 1px solid var(--error-border);
+    color: var(--error-text);
+}
+
+.btn-danger:hover {
+    background: var(--error-bg);
+    color: var(--text-primary);
+}
+
+.btn-outline-danger {
+    border: 1px solid var(--error-border);
+    color: var(--error-text);
+    background: transparent;
+}
+
+.btn-outline-danger:hover {
+    background: var(--error-bg);
+    color: var(--text-primary);
+}
+
+/* =========================
+   TABLA VEHICULOS
+========================= */
+
+.table {
+    color: var(--text-primary);
+    margin-bottom: 0;
+}
+
+.table thead {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table th {
+    font-weight: 500;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* filas */
+
+.table tbody tr {
+    transition: 0.25s;
+}
+
+.table tbody tr:hover {
+    background: var(--link-hover-bg);
+}
+
+/* =========================
+   ALERTAS
+========================= */
+
+.alert {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    color: var(--text-primary);
+}
+
+/* =========================
+   ANIMACION SUAVE
+========================= */
+
+.card {
+    animation: aparecer 0.5s ease;
+}
+
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 992px) {
+    .container .row.g-2 {
+        flex-direction: column;
+    }
+    .container .row.g-2 .col-md-2,
+    .container .row.g-2 .col-md-4,
+    .container .row.g-2 .col-md-8 {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    h2 {
+        font-size: 30px;
+    }
+    .card-body {
+        padding: 18px;
+    }
+    .container {
+        padding: 0 12px;
+    }
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .table thead th,
+    .table td {
+        padding: 10px 8px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 576px) {
+    h2 {
+        font-size: 24px;
+    }
+    .card-body {
+        padding: 14px;
+    }
+    .btn-sm {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}

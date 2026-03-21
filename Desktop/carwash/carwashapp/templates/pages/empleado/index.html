@@ -1,0 +1,136 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="contenedor-dashboard">
+    <h1 class="titulo-seccion">Dashboard de Citas</h1>
+    
+    <!-- Estadísticas de Citas -->
+    <div class="dashboard-stats">
+        <div class="dashboard-card">
+            <h3>{{ total_citas|format_number }}</h3>
+            <p>Total de Citas</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>{{ citas_hoy|format_number }}</h3>
+            <p>Citas Hoy</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>{{ citas_pendientes|format_number }}</h3>
+            <p>Pendientes</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>{{ citas_confirmadas|format_number }}</h3>
+            <p>Confirmadas</p>
+        </div>
+    </div>
+
+    <h3 class="titulo-seccion">Últimas 10 Citas</h3>
+
+    <a href="{% url 'agendar_cita' %}" class="boton-agregar">+ Nueva cita</a>
+
+    {% if citas %}
+    <table class="tabla-vehiculos">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+                <th>Marca</th>       
+                <th>Modelo</th> 
+                <th>Servicio</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Estado</th>
+                <th>Correo enviado</th>
+                <th>Agendado por</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cita in citas %}
+            <tr>
+                <td>{{ cita.nombre }}</td>
+                <td>{{ cita.telefono }}</td>
+                <td>{{ cita.email|default:"-" }}</td>
+                <td>{{ cita.marca.nombre|default:"-" }}</td>    
+                <td>{{ cita.modelo.nombre|default:"-" }}</td>
+                <td>{{ cita.servicio }}</td>
+                <td>{{ cita.fecha }}</td>
+                <td>{{ cita.hora }}</td>
+                <td>{{ cita.get_estado_display }}</td>
+                <td>
+                    {% if cita.correo_enviado %}
+                        ✅
+                    {% elif cita.estado == 'confirmada' and not cita.email %}
+                        ⚠️
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{% if cita.agendado_por %}{{ cita.agendado_por.get_full_name|default:cita.agendado_por.username }}{% else %}Cliente web{% endif %}</td>
+                <td>
+                    <!-- Cambiar estados -->
+                    {% if cita.estado == 'pendiente' %}
+                    <form action="{% url 'cambiar_estado_cita' cita.id 'confirmada' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-comfirmar">Confirmar</button>
+                    </form>
+                    {% endif %}
+
+                    {% if cita.estado == 'confirmada' %}
+                    <form action="{% url 'cambiar_estado_cita' cita.id 'en_proceso' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-proceso">En Proceso</button>
+                    </form>
+                    {% endif %}
+
+                    {% if cita.puede_finalizar %}
+                    <form action="{% url 'cambiar_estado_cita' cita.id 'finalizada' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-finalizar">Finalizar</button>
+                    </form>
+                    {% endif %}
+
+                    {% if cita.estado != 'finalizada' %}
+                    <form action="{% url 'cambiar_estado_cita' cita.id 'cancelada' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-cancelar">Cancelar</button>
+                    </form>
+                    {% endif %}
+
+                    <!-- Eliminar cita -->
+                    <form action="{% url 'eliminar_cita' cita.id %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-eliminar" onclick="return confirm('¿Seguro que quieres eliminar esta cita?')">
+                            Eliminar
+                        </button>
+                    </form>
+                    
+                    <!-- Crear Factura -->
+                    {% if not cita.factura %}
+                        <a href="{% url 'factura_crear' cita.id %}" class="btn-factura btn-factura-dashboard">
+                            Crear Factura
+                        </a>
+                    {% else %}
+                        <a href="{% url 'factura_detalle' cita.factura.id %}" class="btn-success">
+                            📋 Ver Factura
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No hay citas registradas</p>
+    {% endif %}
+
+</div>
+
+{% endblock %}

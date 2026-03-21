@@ -1,0 +1,124 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block title %}Vehículos - Marca y Modelo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/vehiculo.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1>Gestionar marcas y modelos</h1>
+    <p class="text-muted">Agrega marcas y modelos de vehículos para que los clientes puedan seleccionarlos al agendar.</p>
+
+    <!-- AGREGAR MARCA -->
+    <div class="card mb-4">
+        <div class="card-header">Agregar marca</div>
+        <div class="card-body">
+            <form method="post" action="?">
+                {% csrf_token %}
+                <input type="hidden" name="agregar_marca" value="1">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-8">
+                        {{ marca_form.nombre }}
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary w-100">Agregar marca</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- AGREGAR MODELO -->
+    <div class="card mb-4">
+        <div class="card-header">Agregar modelo</div>
+        <div class="card-body">
+            <form method="post" action="?">
+                {% csrf_token %}
+                <input type="hidden" name="agregar_modelo" value="1">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-4">{{ modelo_form.marca }}</div>
+                    <div class="col-md-4">{{ modelo_form.nombre }}</div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary w-100">Agregar modelo</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- BUSCADOR -->
+    <form method="get" class="mb-3">
+        <div class="row g-2">
+            <div class="col-md-10">
+                <input type="text" name="search" class="form-control" placeholder="Buscar marca..." value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Buscar</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- LISTA MARCAS Y MODELOS -->
+    <div class="card">
+        <div class="card-header">Marcas y modelos</div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Marca</th>
+                            <th>Modelos</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for marca in marcas %}
+                        <tr>
+                            <td>{{ marca.nombre }}</td>
+                            <td>
+                                {% for modelo in marca.modelos.all %}
+                                    <span class="badge bg-secondary me-1">{{ modelo.nombre }}</span>
+                                {% empty %}
+                                    <span class="text-muted">Sin modelos</span>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <a href="{% url 'vehiculo_editar_marca' marca.id %}" class="btn btn-sm btn-outline-primary">Editar</a>
+                                <form method="post" action="?" style="display:inline;" onsubmit="return confirm('¿Eliminar marca y todos sus modelos?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="eliminar_marca" value="1">
+                                    <input type="hidden" name="marca_id" value="{{ marca.id }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% for modelo in marca.modelos.all %}
+                        <tr class="table-light">
+                            <td class="ps-5"><small>↳ {{ modelo.nombre }}</small></td>
+                            <td>—</td>
+                            <td>
+                                <a href="{% url 'vehiculo_editar_modelo' modelo.id %}" class="btn btn-sm btn-outline-primary">Editar</a>
+                                <form method="post" action="?" style="display:inline;" onsubmit="return confirm('¿Eliminar este modelo?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="eliminar_modelo" value="1">
+                                    <input type="hidden" name="modelo_id" value="{{ modelo.id }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">No hay marcas. Agrega una arriba.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

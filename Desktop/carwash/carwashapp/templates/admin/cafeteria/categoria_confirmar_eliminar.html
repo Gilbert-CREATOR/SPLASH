@@ -1,0 +1,111 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="container">
+        <div class="admin-header">
+            <h1>🗑️ Eliminar Categoría</h1>
+            <a href="{% url 'admin_categorias' %}" class="btn-secondary">← Volver</a>
+        </div>
+
+        <div class="confirmar-eliminar">
+            <div class="alerta alerta-peligro">
+                <h2>⚠️ ¿Estás seguro de eliminar esta categoría?</h2>
+                <p>Esta acción no se puede deshacer.</p>
+            </div>
+
+            <div class="detalle-item">
+                <h3>{{ categoria.nombre }}</h3>
+                {% if categoria.descripcion %}
+                    <p>{{ categoria.descripcion }}</p>
+                {% endif %}
+                <div class="meta-info">
+                    <span>📦 {{ categoria.productos.count }} productos asociados</span>
+                    <span>🔢 Orden: {{ categoria.orden }}</span>
+                    <span class="estado-{{ categoria.activo|yesno:'activo,inactivo' }}">
+                        {{ categoria.activo|yesno:"Activo,Inactivo" }}
+                    </span>
+                </div>
+            </div>
+
+            <form method="post" class="form-confirmar">
+                {% csrf_token %}
+                <div class="form-actions">
+                    <a href="{% url 'admin_categorias' %}" class="btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn-danger">🗑️ Eliminar Categoría</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.confirmar-eliminar {
+    max-width: 600px;
+    margin: 40px auto;
+}
+
+.alerta {
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.alerta-peligro {
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    color: var(--text-primary);
+}
+
+.detalle-item {
+    background: var(--bg-secondary);
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border: 1px solid var(--border-color);
+}
+
+.detalle-item h3 {
+    margin: 0 0 10px 0;
+    color: var(--text-primary);
+}
+
+.meta-info {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.meta-info span {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.form-confirmar {
+    text-align: center;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .meta-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+</style>
+{% endblock %}

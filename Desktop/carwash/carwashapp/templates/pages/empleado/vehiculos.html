@@ -1,0 +1,42 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/vehiculos.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-vehiculos">
+<h1>Lista de Vehículos</h1>
+<p>Aquí se mostrarán los vehículos que entran al taller.</p>
+
+{% if vehiculos %}
+<div class="vehiculos-table-wrap">
+    <table class="vehiculos-table">
+        <thead>
+            <tr>
+                <th>Marca</th>
+                <th>Modelo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in vehiculos %}
+            <tr>
+                <td data-label="Marca">{{ v.marca.nombre }}</td>
+                <td data-label="Modelo">{{ v.modelo.nombre }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="vehiculos-table-wrap">
+    <table class="vehiculos-table">
+        <tbody>
+            <tr><td class="empty-msg">No hay vehículos registrados.</td></tr>
+        </tbody>
+    </table>
+</div>
+{% endif %}
+</div>
+{% endblock %}

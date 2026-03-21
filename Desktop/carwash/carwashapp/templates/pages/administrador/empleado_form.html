@@ -1,0 +1,47 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/empleado_form.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h1>Dashboard Administrador</h1>
+<!-- resto del contenido -->
+
+<h1>Agregar Nuevo Empleado</h1>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" name="username" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" name="first_name" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label>Apellido</label>
+        <input type="text" name="last_name" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" name="password" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label>Rol del Empleado</label>
+        {{ form.rol }}
+        <small class="form-text text-muted">
+            <strong>Empleado:</strong> Solo puede gestionar productos<br>
+            <strong>Admin:</strong> Puede gestionar productos y categorías, pero no crear otros empleados
+        </small>
+    </div>
+    <button type="submit" class="btn-primary">Crear Empleado</button>
+</form>
+{% endblock %}

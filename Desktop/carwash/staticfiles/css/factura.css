@@ -1,0 +1,462 @@
+/* =========================
+   ESTILOS DE FACTURAS
+========================= */
+
+.factura-page {
+    padding: 40px 0;
+    min-height: 100vh;
+    background: var(--bg-page);
+}
+
+/* Header de Factura */
+.factura-header {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 40px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.factura-logo h1 {
+    font-size: 32px;
+    margin: 0 0 5px 0;
+    color: var(--text-primary);
+}
+
+.factura-logo p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 16px;
+}
+
+.factura-info {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.factura-numero {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 15px;
+}
+
+.factura-fecha {
+    margin-bottom: 15px;
+    color: var(--text-secondary);
+}
+
+.factura-estado {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.estado-pendiente { background: var(--warning-bg); color: var(--text-primary); }
+.estado-emitida { background: var(--info-bg); color: var(--text-primary); }
+.estado-pagada { background: var(--success-bg); color: var(--text-primary); }
+.estado-cancelada { background: var(--error-bg); color: var(--text-primary); }
+
+/* Secciones */
+.factura-cliente,
+.factura-detalles,
+.factura-totales,
+.factura-notas,
+.factura-pago {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.factura-cliente h2,
+.factura-detalles h2,
+.factura-totales h2,
+.factura-notas h2,
+.factura-pago h2 {
+    font-size: 24px;
+    margin: 0 0 20px 0;
+    color: var(--text-primary);
+}
+
+/* Grids */
+.cliente-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.cliente-item {
+    padding: 15px;
+    background: var(--bg-input);
+    border-radius: 8px;
+    border-left: 4px solid var(--accent);
+}
+
+.cliente-item strong {
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.metodo-pago {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.metodo-efectivo { background: var(--success-bg); color: var(--text-primary); }
+.metodo-tarjeta { background: var(--info-bg); color: var(--text-primary); }
+.metodo-transferencia { background: var(--warning-bg); color: var(--text-primary); }
+.metodo-mixto { background: var(--accent); color: var(--accent-hover); }
+
+/* Tablas de Factura */
+.factura-seccion {
+    margin-bottom: 40px;
+}
+
+.factura-seccion h3 {
+    font-size: 20px;
+    margin: 0 0 20px 0;
+    color: var(--text-primary);
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent);
+}
+
+.factura-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.factura-table th,
+.factura-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.factura-table th {
+    background: var(--bg-input);
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.factura-table td {
+    color: var(--text-secondary);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.no-items {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 20px;
+    background: var(--bg-input);
+    border-radius: 8px;
+}
+
+/* Totales */
+.totales-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.totales-seccion {
+    background: var(--bg-input);
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.totales-seccion h4 {
+    font-size: 18px;
+    margin: 0 0 20px 0;
+    color: var(--text-primary);
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.total-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.total-item:last-child {
+    border-bottom: none;
+}
+
+.total-final {
+    background: var(--accent);
+    color: var(--accent-hover);
+    border: 1px solid var(--accent);
+    margin-top: 30px;
+}
+
+.total-final h4 {
+    color: var(--accent-hover);
+}
+
+.gran-total {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent-hover);
+    padding: 15px 0;
+    border-top: 2px solid var(--accent-hover);
+    margin-top: 10px;
+}
+
+/* Notas */
+.factura-notas {
+    border-left: 4px solid var(--accent);
+}
+
+.notas-content {
+    background: var(--bg-input);
+    padding: 20px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Pago */
+.pago-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.pago-item {
+    padding: 15px;
+    background: var(--bg-input);
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Acciones */
+.factura-acciones {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.acciones-grid {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Botones */
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: var(--accent-hover);
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+    color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--border-color);
+}
+
+.btn-success {
+    background: var(--success-bg);
+    color: var(--text-primary);
+}
+
+.btn-success:hover {
+    opacity: 0.8;
+}
+
+.btn-info {
+    background: var(--info-bg);
+    color: var(--text-primary);
+}
+
+.btn-info:hover {
+    opacity: 0.8;
+}
+
+.btn-warning {
+    background: var(--warning-bg);
+    color: var(--text-primary);
+}
+
+.btn-warning:hover {
+    opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .factura-page {
+        padding: 20px 0;
+    }
+    
+    .factura-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 30px 20px;
+    }
+    
+    .factura-info {
+        text-align: center;
+    }
+    
+    .factura-cliente,
+    .factura-detalles,
+    .factura-totales,
+    .factura-notas,
+    .factura-pago {
+        padding: 20px;
+    }
+    
+    .factura-table {
+        font-size: 14px;
+    }
+    
+    .factura-table th,
+    .factura-table td {
+        padding: 10px 5px;
+    }
+    
+    .totales-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .acciones-grid {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .acciones-grid .btn {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .cliente-grid,
+    .pago-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .factura-header h1 {
+        font-size: 24px;
+    }
+    
+    .factura-numero {
+        font-size: 18px;
+    }
+    
+    .factura-table {
+        font-size: 12px;
+    }
+    
+    .factura-table th,
+    .factura-table td {
+        padding: 8px 3px;
+    }
+    
+    .gran-total {
+        font-size: 18px;
+    }
+}
+
+/* Estilos específicos para impresión */
+@media print {
+    .factura-acciones {
+        display: none !important;
+    }
+    
+    .factura-page {
+        background: white !important;
+        color: black !important;
+        padding: 20px !important;
+    }
+    
+    .factura-header,
+    .factura-cliente,
+    .factura-detalles,
+    .factura-totales,
+    .factura-notas,
+    .factura-pago {
+        background: white !important;
+        color: black !important;
+        border: 1px solid #ccc !important;
+        page-break-inside: avoid;
+        margin-bottom: 20px !important;
+    }
+    
+    .factura-table th,
+    .factura-table td {
+        border-color: #ccc !important;
+        color: black !important;
+    }
+    
+    .totales-seccion {
+        background: #f5f5f5 !important;
+        border-color: #ccc !important;
+    }
+    
+    .total-final {
+        background: #333 !important;
+        color: white !important;
+    }
+    
+    .estado-pagada,
+    .estado-emitida {
+        background: #333 !important;
+        color: white !important;
+    }
+}

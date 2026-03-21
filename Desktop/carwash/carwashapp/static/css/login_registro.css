@@ -1,0 +1,277 @@
+/* =====================
+   LOGIN/REGISTRO - Usa variables globales de theme-global.css
+===================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ===================== FONDO Y CONTENEDOR ===================== */
+.log_re.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--bg-page);
+}
+
+.log_regis-container {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin: 2rem auto;
+    max-width: 420px;
+    width: 100%;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.log_regis-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* ===================== TITULO ===================== */
+.log_regis-container h1 {
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    text-align: center;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ===================== FORMULARIOS ===================== */
+.log_regis-container .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.log_regis-container label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.log_regis-container input[type="text"],
+.log_regis-container input[type="email"],
+.log_regis-container input[type="password"] {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 14px;
+    transition: all 0.3s ease;
+    min-height: 44px;
+}
+
+.log_regis-container input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.log_regis-container .btn {
+    width: 100%;
+    padding: 12px 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 44px;
+}
+
+.log_regis-container .btn:hover {
+    background: var(--accent);
+    color: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ===================== ENLACES ===================== */
+.log_regis-container .links {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.log_regis-container .links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.log_regis-container .links a:hover {
+    color: var(--text-primary);
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 480px) {
+    .log_regis-container {
+        margin: 1rem;
+        padding: 2rem;
+    }
+}
+
+/* ===================== CAMPOS CON ANIMACIÓN ===================== */
+.username {
+    position: relative;
+}
+
+.username input {
+    width: 100%;
+    padding: 14px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+}
+
+/* Resplandor y borde activo */
+.username input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 8px rgba(255,255,255,0.3);
+}
+
+/* Label */
+.username label {
+    position: absolute;
+    left: 12px;
+    top: 14px;
+    color: var(--text-secondary);
+    font-size: 16px;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    background-color: transparent;
+    padding: 0 4px;
+}
+
+/* Label flota al hacer focus o si el input tiene valor */
+.username input:focus + label,
+.username input:not(:placeholder-shown) + label {
+    top: -10px;
+    font-size: 12px;
+    color: var(--text-primary);
+    background-color: var(--bg-card);
+}
+
+/* Línea animada debajo */
+.username span {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background-color: var(--accent);
+    transition: width 0.3s ease;
+}
+
+.username input:focus ~ span {
+    width: 100%;
+}
+
+/* ===================== BOTÓN PRINCIPAL ===================== */
+.formulario input[type="submit"] {
+    background: transparent;
+    color: var(--text-primary);
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.formulario input[type="submit"]:hover {
+    background-color: var(--accent);
+    color: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,255,255,0.2);
+}
+
+/* ===================== RECORDAR Y REGISTRO ===================== */
+.recordar {
+    text-align: right;
+}
+
+.recordar a,
+.registrarse a {
+    font-size: 14px;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.recordar a:hover,
+.registrarse a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+/* ===================== DIVISOR ===================== */
+.divisor {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.divisor span {
+    flex: 1;
+    border-bottom: 1px solid var(--border-color);
+    line-height: 0.1em;
+    margin: 0 10px;
+}
+
+/* ===================== LOGIN SOCIAL ===================== */
+.login-social {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.boton-social {
+    flex: 1;
+    padding: 10px;
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.3s;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+}
+
+.boton-social:hover {
+    background: var(--accent);
+    color: var(--accent-hover);
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 480px) {
+    .log_regis-container {
+        padding: 30px 20px;
+    }
+
+    .login-social {
+        flex-direction: column;
+    }
+}

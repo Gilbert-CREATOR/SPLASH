@@ -1,0 +1,351 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block title %}Cafetería & Bar · B&B Car Wash{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cafeteria.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="cafeteria-page">
+    <div class="container">
+        <!-- Header -->
+        <div class="cafeteria-header">
+            <h1>☕ Cafetería & Bar</h1>
+            <p>Disfruta de nuestras bebidas y snacks mientras esperas tu vehículo</p>
+            
+            {% if cita_activa %}
+                <div class="cita-activa-card">
+                    <h3>🚗 Tienes una cita activa</h3>
+                    <p><strong>Servicio:</strong> {{ cita_activa.servicio.nombre }}</p>
+                    <p><strong>Fecha:</strong> {{ cita_activa.fecha }} a las {{ cita_activa.hora }}</p>
+                    <a href="{% url 'cafeteria_orden_create_cita' cita_activa.id %}" class="btn-primary">
+                        🛒 Ordenar para esta cita
+                    </a>
+                </div>
+            {% elif request.user.is_authenticated %}
+                <div class="cita-info-card">
+                    <h3>👤 Bienvenido {{ user.get_full_name|default:user.username }}</h3>
+                    <p>Para ordenar para una cita específica, primero agenda una cita.</p>
+                    <a href="{% url 'agendar_cita' %}" class="btn-secondary">
+                        🚗 Agendar Cita Primero
+                    </a>
+                </div>
+            {% else %}
+                <div class="login-card">
+                    <h3>👤 Inicia sesión para ordenar</h3>
+                    <p>Para realizar pedidos, por favor inicia sesión o crea una cuenta.</p>
+                    <div class="login-actions">
+                        <a href="{% url 'login' %}" class="btn-primary">
+                            🔐 Iniciar Sesión
+                        </a>
+                        <a href="{% url 'registro' %}" class="btn-secondary">
+                            📝 Crear Cuenta
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Menú por Categorías -->
+        <div class="menu-container">
+            {% for categoria in categorias %}
+                <div class="categoria-section">
+                    <h2 class="categoria-titulo">{{ categoria.nombre }}</h2>
+                    {% if categoria.descripcion %}
+                        <p class="categoria-descripcion">{{ categoria.descripcion }}</p>
+                    {% endif %}
+                    
+                    <div class="productos-grid">
+                        {% for producto in categoria.productos.all %}
+                            {% if producto.activo and producto.stock > 0 %}
+                                <div class="producto-card">
+                                    {% if producto.imagen %}
+                                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="producto-imagen">
+                                    {% else %}
+                                        <div class="producto-imagen-placeholder">
+                                            🍽️
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="producto-info">
+                                        {% if producto.popular %}
+                                            <span class="badge-popular">⭐ Popular</span>
+                                        {% endif %}
+                                        
+                                        <h3 class="producto-nombre">{{ producto.nombre }}</h3>
+                                        
+                                        {% if producto.descripcion %}
+                                            <p class="producto-descripcion">{{ producto.descripcion }}</p>
+                                        {% endif %}
+                                        
+                                        {% if producto.ingredientes %}
+                                            <p class="producto-ingredientes">
+                                                <small>📋 {{ producto.ingredientes }}</small>
+                                            </p>
+                                        {% endif %}
+                                        
+                                        <div class="producto-meta">
+                                            <span class="producto-precio">${{ producto.precio }}</span>
+                                            <span class="producto-tiempo">⏱️ {{ producto.preparacion_tiempo }} min</span>
+                                        </div>
+                                        
+                                        {% if producto.stock <= 5 %}
+                                            <p class="stock-bajo">⚠️ ¡Últimas {{ producto.stock }} unidades!</p>
+                                        {% endif %}
+                                        
+                                        <button class="btn-agregar-producto" 
+                                                data-producto-id="{{ producto.id }}"
+                                                data-producto-nombre="{{ producto.nombre }}"
+                                                data-producto-precio="{{ producto.precio }}"
+                                                data-stock="{{ producto.stock }}">
+                                            🛒 Agregar
+                                        </button>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="no-productos">
+                    <h2>📭 No hay productos disponibles</h2>
+                    <p>Vuelve más tarde para ver nuestro menú actualizado.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Carrito Flotante -->
+        <div class="carrito-flotante" id="carrito">
+            <div class="carrito-header">
+                <h3>🛒 Tu Orden</h3>
+                <span class="carrito-contador" id="carrito-contador">0</span>
+            </div>
+            
+            <div class="carrito-items" id="carrito-items">
+                <p class="carrito-vacio">Tu orden está vacía</p>
+            </div>
+            
+            <div class="carrito-footer" id="carrito-footer" style="display: none;">
+                <div class="carrito-total">
+                    <span>Total:</span>
+                    <span id="carrito-total">$0.00</span>
+                </div>
+                <button class="btn-confirmar-orden" id="btn-confirmar-orden">
+                    Confirmar Orden
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div class="modal" id="modal-confirmar">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Confirmar tu Orden</h3>
+            <button class="modal-close" onclick="cerrarModal()">&times;</button>
+        </div>
+        
+        <form method="post" action="{% url 'cafeteria_orden_create' %}">
+            {% csrf_token %}
+            
+            <div class="modal-body">
+                <div class="orden-resumen" id="orden-resumen">
+                    <!-- Se llenará con JavaScript -->
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_cliente_nombre">Nombre:</label>
+                    <input type="text" name="cliente_nombre" id="id_cliente_nombre" 
+                           value="{{ user.get_full_name|default:user.username }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_cliente_telefono">Teléfono:</label>
+                    <input type="tel" name="cliente_telefono" id="id_cliente_telefono" 
+                           placeholder="Opcional">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_notas">Notas adicionales:</label>
+                    <textarea name="notas" id="id_notas" rows="3" 
+                              placeholder="Instrucciones especiales"></textarea>
+                </div>
+                
+                <!-- Hidden inputs para productos -->
+                <div id="productos-hidden"></div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="cerrarModal()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-primary">
+                    Confirmar Orden
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Carrito de compras
+let carrito = [];
+
+function agregarAlCarrito(productoId, nombre, precio, stock) {
+    const itemExistente = carrito.find(item => item.id === productoId);
+    
+    if (itemExistente) {
+        if (itemExistente.cantidad < stock) {
+            itemExistente.cantidad++;
+        } else {
+            showNotification('No hay más stock disponible', 'error');
+            return;
+        }
+    } else {
+        carrito.push({
+            id: productoId,
+            nombre: nombre,
+            precio: parseFloat(precio),
+            cantidad: 1
+        });
+    }
+    
+    actualizarCarrito();
+    showNotification(`${nombre} agregado a tu orden`, 'success');
+}
+
+function actualizarCarrito() {
+    const carritoItems = document.getElementById('carrito-items');
+    const carritoContador = document.getElementById('carrito-contador');
+    const carritoTotal = document.getElementById('carrito-total');
+    const carritoFooter = document.getElementById('carrito-footer');
+    
+    if (carrito.length === 0) {
+        carritoItems.innerHTML = '<p class="carrito-vacio">Tu orden está vacía</p>';
+        carritoFooter.style.display = 'none';
+        carritoContador.textContent = '0';
+        return;
+    }
+    
+    let html = '';
+    let total = 0;
+    let cantidadTotal = 0;
+    
+    carrito.forEach(item => {
+        const subtotal = item.precio * item.cantidad;
+        html += `
+            <div class="carrito-item">
+                <div class="item-info">
+                    <span class="item-nombre">${item.nombre}</span>
+                    <span class="item-precio">$${item.precio}</span>
+                </div>
+                <div class="item-cantidad">
+                    <button onclick="cambiarCantidad(${item.id}, -1)">-</button>
+                    <span>${item.cantidad}</span>
+                    <button onclick="cambiarCantidad(${item.id}, 1)">+</button>
+                </div>
+                <div class="item-subtotal">$${subtotal.toFixed(2)}</div>
+                <button class="item-eliminar" onclick="eliminarDelCarrito(${item.id})">×</button>
+            </div>
+        `;
+        total += subtotal;
+        cantidadTotal += item.cantidad;
+    });
+    
+    carritoItems.innerHTML = html;
+    carritoTotal.textContent = `$${total.toFixed(2)}`;
+    carritoContador.textContent = cantidadTotal;
+    carritoFooter.style.display = 'block';
+}
+
+function cambiarCantidad(productoId, cambio) {
+    const item = carrito.find(item => item.id === productoId);
+    if (item) {
+        const nuevaCantidad = item.cantidad + cambio;
+        if (nuevaCantidad > 0) {
+            item.cantidad = nuevaCantidad;
+            actualizarCarrito();
+        }
+    }
+}
+
+function eliminarDelCarrito(productoId) {
+    carrito = carrito.filter(item => item.id !== productoId);
+    actualizarCarrito();
+}
+
+function confirmarOrden() {
+    if (carrito.length === 0) {
+        showNotification('Tu orden está vacía', 'error');
+        return;
+    }
+    
+    // Llenar resumen
+    const ordenResumen = document.getElementById('orden-resumen');
+    let html = '<h4>Resumen de tu orden:</h4><ul>';
+    
+    carrito.forEach(item => {
+        html += `<li>${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toFixed(2)}</li>`;
+    });
+    
+    html += '</ul>';
+    ordenResumen.innerHTML = html;
+    
+    // Agregar hidden inputs
+    const productosHidden = document.getElementById('productos-hidden');
+    productosHidden.innerHTML = '';
+    
+    carrito.forEach(item => {
+        productosHidden.innerHTML += `
+            <input type="hidden" name="productos" value="${item.id}">
+            <input type="hidden" name="cantidades" value="${item.cantidad}">
+        `;
+    });
+    
+    // Abrir modal
+    document.getElementById('modal-confirmar').style.display = 'block';
+}
+
+function cerrarModal() {
+    document.getElementById('modal-confirmar').style.display = 'none';
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Botones agregar producto
+    document.querySelectorAll('.btn-agregar-producto').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productoId = parseInt(this.dataset.productoId);
+            const nombre = this.dataset.productoNombre;
+            const precio = parseFloat(this.dataset.productoPrecio);
+            const stock = parseInt(this.dataset.stock);
+            
+            agregarAlCarrito(productoId, nombre, precio, stock);
+        });
+    });
+    
+    // Botón confirmar orden
+    document.getElementById('btn-confirmar-orden').addEventListener('click', confirmarOrden);
+    
+    // Cerrar modal al hacer click fuera
+    document.getElementById('modal-confirmar').addEventListener('click', function(e) {
+        if (e.target === this) {
+            cerrarModal();
+        }
+    });
+});
+
+// Animación CSS
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

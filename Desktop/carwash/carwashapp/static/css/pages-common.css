@@ -1,0 +1,338 @@
+/* =========================
+   ESTILOS COMUNES - TODAS LAS PÁGINAS
+   Responsive y con variables de tema
+========================= */
+
+main {
+    padding: 20px 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: calc(100vh - 140px);
+}
+
+main h1 {
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    margin-bottom: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+main h2 {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+main h3 {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    margin-bottom: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+main p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+main .text-muted {
+    color: var(--text-muted);
+}
+
+/* =========================
+   BOTONES COMUNES
+========================= */
+main .btn,
+main .btn-primary,
+main .btn-secondary,
+main .btn-success,
+main .btn-danger,
+main .btn-warning,
+main .btn-info,
+main .btn-agregar,
+main .boton-agregar,
+main .btn-editar,
+main .btn-eliminar,
+main .btn-finalizar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 14px;
+    text-decoration: none;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    gap: 8px;
+    min-height: 44px;
+}
+
+main .btn:hover,
+main .btn-primary:hover,
+main .btn-agregar:hover,
+main .boton-agregar:hover,
+main .btn-editar:hover {
+    background: var(--accent);
+    color: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+main .btn-secondary {
+    border-color: var(--border-color);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+main .btn-secondary:hover {
+    background: var(--accent);
+    color: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+main .btn-success {
+    border-color: var(--success-border);
+    color: var(--success-text);
+}
+
+main .btn-success:hover {
+    background: var(--success-bg);
+    border-color: var(--success-text);
+    color: var(--success-text);
+    transform: translateY(-1px);
+}
+
+main .btn-danger {
+    border-color: var(--error-border);
+    color: var(--error-text);
+}
+
+main .btn-danger:hover,
+main .btn-eliminar:hover {
+    background: var(--error-bg);
+    border-color: var(--error-text);
+    color: var(--error-text);
+    transform: translateY(-1px);
+}
+
+main .btn-warning {
+    border-color: var(--warning-border);
+    color: var(--warning-text);
+}
+
+main .btn-warning:hover {
+    background: var(--warning-bg);
+    border-color: var(--warning-text);
+    color: var(--warning-text);
+    transform: translateY(-1px);
+}
+
+main .btn-info {
+    border-color: var(--info-border, #64b5f6);
+    color: var(--info-text, #90caf9);
+}
+
+main .btn-info:hover {
+    background: var(--info-bg, rgba(100, 181, 246, 0.1));
+    border-color: var(--info-text, #90caf9);
+    color: var(--info-text, #90caf9);
+    transform: translateY(-1px);
+}
+
+/* =========================
+   FORMULARIOS
+========================= */
+.form-label,
+main label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+}
+
+.form-control,
+main input[type="text"],
+main input[type="email"],
+main input[type="tel"],
+main input[type="date"],
+main input[type="password"],
+main input[type="number"],
+main input[type="time"],
+main input[type="file"],
+main select,
+main textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    min-height: 44px;
+}
+
+.form-control:focus,
+main input:focus,
+main select:focus,
+main textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    background: var(--bg-input);
+}
+
+.form-control::placeholder,
+main input::placeholder,
+main textarea::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.form-select {
+    cursor: pointer;
+}
+
+main .form-group {
+    margin-bottom: 1.5rem;
+}
+
+main .form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+main .form-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+/* =========================
+   CARDS Y CONTENEDORES
+========================= */
+main .card,
+main .container-card,
+main .servicio-card,
+main .producto-card,
+main .cita-card,
+main .factura-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+main .card:hover,
+main .servicio-card:hover,
+main .producto-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+main .card-header,
+main .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+main .card-body {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+main .card-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+/* =========================
+   TABLAS
+========================= */
+main .table,
+main table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+main .table th,
+main table th {
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-weight: 600;
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+main .table td,
+main table td {
+    padding: 16px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-light);
+}
+
+main .table tr:hover,
+main table tr:hover {
+    background: var(--bg-input);
+}
+
+main .table-striped tr:nth-child(even) {
+    background: var(--bg-input);
+}
+
+/* =========================
+   UTILIDADES
+========================= */
+.d-flex { display: flex; }
+.flex-wrap { flex-wrap: wrap; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 1rem; }
+.mb-3 { margin-bottom: 1rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+.mt-4 { margin-top: 1.5rem; }
+.justify-content-center { justify-content: center; }
+.text-center { text-align: center; }
+
+/* =========================
+   RESPONSIVE GLOBAL
+========================= */
+@media (max-width: 768px) {
+    main {
+        padding: 16px 12px;
+    }
+    main h1 {
+        font-size: 1.35rem;
+    }
+}
+
+@media (max-width: 480px) {
+    main {
+        padding: 12px 10px;
+    }
+    main h1 {
+        font-size: 1.25rem;
+    }
+}

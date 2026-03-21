@@ -1,0 +1,156 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
+
+{% block title %}Finalizar Sesión{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="container">
+        <div class="admin-header">
+            <h1>🛑 Finalizar Sesión</h1>
+            <a href="{% url 'admin_sesiones' %}" class="btn-secondary">← Volver</a>
+        </div>
+
+        <div class="confirmar-finalizar">
+            <div class="alerta alerta-advertencia">
+                <h2>⚠️ ¿Estás seguro de finalizar esta sesión?</h2>
+                <p>Esta acción registrará el tiempo total de la sesión.</p>
+            </div>
+
+            <div class="sesion-detalle">
+                <div class="sesion-info">
+                    <h3>{{ sesion.empleado.username }}</h3>
+                    <p class="empleado-email">{{ sesion.empleado.email }}</p>
+                    
+                    <div class="sesion-tiempos">
+                        <div class="tiempo-item">
+                            <span class="tiempo-label">🕐 Inicio:</span>
+                            <span class="tiempo-value">{{ sesion.fecha_inicio|date:"d/m/Y H:i:s" }}</span>
+                        </div>
+                        
+                        <div class="tiempo-item">
+                            <span class="tiempo-label">⏱️ Tiempo actual:</span>
+                            <span class="tiempo-value">Activa</span>
+                        </div>
+                        
+                        <div class="tiempo-item">
+                            <span class="tiempo-label">📊 Estado:</span>
+                            <span class="badge-activa">🟢 Activa</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post" class="form-confirmar">
+                {% csrf_token %}
+                <div class="form-actions">
+                    <a href="{% url 'admin_sesiones' %}" class="btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn-danger">🛑 Finalizar Sesión</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.confirmar-finalizar {
+    max-width: 600px;
+    margin: 40px auto;
+}
+
+.alerta {
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.alerta-advertencia {
+    background: var(--warning-bg);
+    border: 1px solid var(--warning-border);
+    color: var(--text-primary);
+}
+
+.sesion-detalle {
+    background: var(--bg-card);
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border: 1px solid var(--border-color);
+}
+
+.sesion-info h3 {
+    margin: 0 0 5px 0;
+    color: var(--text-primary);
+}
+
+.empleado-email {
+    margin: 0 0 20px 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.sesion-tiempos {
+    display: grid;
+    gap: 15px;
+}
+
+.tiempo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+}
+
+.tiempo-label {
+    color: var(--text-secondary);
+    font-size: 14px;
+    min-width: 100px;
+}
+
+.tiempo-value {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.badge-activa {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--success-bg);
+    color: var(--success-text);
+}
+
+.form-confirmar {
+    text-align: center;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .tiempo-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .tiempo-label {
+        min-width: auto;
+    }
+}
+</style>
+{% endblock %}

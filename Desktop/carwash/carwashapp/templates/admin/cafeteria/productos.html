@@ -1,0 +1,297 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block title %}Productos de Cafetería · Administración{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+<link rel="stylesheet" href="{% static 'css/cafeteria.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="container">
+        <div class="admin-header">
+            <h1>🍽️ Productos de Cafetería</h1>
+            <div class="header-actions">
+                {% if user.is_superuser or user.perfil.rol == 'admin' %}
+                <a href="{% url 'admin_categoria_create' %}" class="btn-secondary">
+                    📂 Gestionar Categorías
+                </a>
+                {% endif %}
+                <a href="{% url 'admin_producto_create' %}" class="btn-primary">
+                    ➕ Nuevo Producto
+                </a>
+            </div>
+        </div>
+
+        {% if productos %}
+            <div class="productos-admin-grid">
+                {% for producto in productos %}
+                    <div class="producto-admin-card">
+                        <div class="producto-header">
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="producto-thumb">
+                            {% else %}
+                                <div class="producto-thumb-placeholder">
+                                    🍽️
+                                </div>
+                            {% endif %}
+                            
+                            <div class="producto-info">
+                                <h3>{{ producto.nombre }}</h3>
+                                <p class="producto-categoria">{{ producto.categoria.nombre }}</p>
+                                {% if producto.popular %}
+                                    <span class="badge-popular">⭐ Popular</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="producto-detalles">
+                            {% if producto.descripcion %}
+                                <p class="producto-descripcion">{{ producto.descripcion|truncatewords:15 }}</p>
+                            {% endif %}
+                            
+                            {% if producto.ingredientes %}
+                                <p class="producto-ingredientes">
+                                    <small>📋 {{ producto.ingredientes|truncatewords:10 }}</small>
+                                </p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="producto-meta">
+                            <div class="precio-info">
+                                <span class="precio">${{ producto.precio }}</span>
+                                <span class="tiempo">⏱️ {{ producto.preparacion_tiempo }} min</span>
+                            </div>
+                            
+                            <div class="stock-info">
+                                {% if producto.stock > 0 %}
+                                    <span class="stock-disponible">📦 {{ producto.stock }} unidades</span>
+                                {% else %}
+                                    <span class="stock-agotado">❌ Agotado</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="producto-estado">
+                            <span class="estado-{% if producto.activo %}activo{% else %}inactivo{% endif %}">
+                                {% if producto.activo %}
+                                    ✅ Activo
+                                {% else %}
+                                    ❌ Inactivo
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="producto-acciones">
+                            <a href="{% url 'admin_producto_toggle' producto.id %}" 
+                               class="btn-toggle btn-{% if producto.activo %}desactivar{% else %}activar{% endif %}"
+                               title="Desactivar">
+                                {% if producto.activo %}
+                                    🔴
+                                {% else %}
+                                    🟢
+                                {% endif %}
+                            </a>
+                            <a href="{% url 'admin_producto_edit' producto.id %}" class="btn-edit" title="Editar">
+                                ✏️
+                            </a>
+                            <a href="{% url 'admin_producto_delete' producto.id %}" class="btn-delete" title="Eliminar">
+                                🗑️
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-data">
+                <h2>📭 No hay productos registrados</h2>
+                <p>Comienza agregando productos a tu menú de cafetería.</p>
+                <div class="no-data-actions">
+                    <a href="{% url 'admin_producto_create' %}" class="btn-primary">
+                        ➕ Crear Primer Producto
+                    </a>
+                    {% if user.is_superuser or user.perfil.rol == 'admin' %}
+                    <a href="{% url 'admin_categoria_create' %}" class="btn-secondary">
+                        📂 Crear Categoría Primero
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Estilos adicionales si son necesarios */
+.productos-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.producto-admin-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.producto-admin-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.producto-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.producto-thumb {
+    width: 120px !important;
+    height: 120px !important;
+    border-radius: 12px !important;
+    object-fit: cover !important;
+    margin-bottom: 15px;
+}
+
+.producto-thumb-placeholder {
+    width: 120px !important;
+    height: 120px !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 48px !important;
+    background: var(--bg-input) !important;
+    color: var(--text-muted) !important;
+    margin-bottom: 15px;
+}
+
+.producto-info {
+    text-align: center;
+    width: 100%;
+}
+
+.producto-info h3 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    color: var(--text-primary);
+}
+
+.producto-categoria {
+    margin: 0 0 10px 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.badge-popular {
+    display: inline-block;
+    background: var(--warning-bg);
+    color: var(--text-primary);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.producto-detalles {
+    margin-bottom: 15px;
+}
+
+.producto-descripcion,
+.producto-ingredientes {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.producto-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px 0;
+    border-top: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.precio-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.precio {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+.tiempo {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.stock-info,
+.producto-estado {
+    text-align: right;
+}
+
+.estado-activo,
+.estado-inactivo {
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 8px;
+}
+
+.estado-activo {
+    background: var(--success-bg);
+    color: var(--success-text);
+}
+
+.estado-inactivo {
+    background: var(--error-bg);
+    color: var(--error-text);
+}
+
+.producto-acciones {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.producto-acciones a {
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-toggle {
+    background: var(--accent);
+    color: var(--accent-hover);
+}
+
+.btn-edit {
+    background: var(--info-bg);
+    color: var(--text-primary);
+}
+
+.btn-delete {
+    background: var(--error-bg);
+    color: var(--text-primary);
+}
+
+.producto-acciones a:hover {
+    opacity: 0.8;
+}
+</style>
+{% endblock %}

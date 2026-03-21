@@ -1,0 +1,753 @@
+/* =========================
+   ESTILOS GENERALES
+========================= */
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px; /* Base rem unit */
+}
+
+/* Viewport optimization */
+@viewport {
+    width: device-width;
+    zoom: 1.0;
+}
+
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg-page, #0b0f14);
+    color: var(--text-primary, #ffffff);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 1400px;
+    margin: auto;
+    padding: 0 20px;
+    width: 100%;
+}
+
+/* Optimizaciones táctiles */
+* {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+/* Imágenes responsive */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* =========================
+   HERO
+========================= */
+.hero {
+    min-height: 90vh;
+    background:
+        linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.85)),
+        url("../img/negro.jpg") center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 40px;
+}
+
+.hero {
+    background: 
+    linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.85)),
+    url("../img/negro.jpg") center/cover no-repeat fixed;
+    min-height: 100vh;
+}
+
+/* Tema claro - cambiar imagen de fondo */
+[data-theme="light"] .hero {
+    background: 
+    linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0.3)),
+    url("../img/Negro_blanco.png") center/cover no-repeat fixed;
+}
+
+
+
+.hero h1 {
+    font-size: 72px;
+    font-weight: 800;
+    letter-spacing: 6px;
+    margin-bottom: 10px;
+}
+
+.hero h2 {
+    font-size: 20px;
+    font-weight: 400;
+    max-width: 650px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.hero .btn-primary {
+    width: fit-content;
+    margin-top: 30px;
+}
+
+/* =========================
+   SECCIONES FLOTANTES
+========================= */
+.intro,
+.servicios-section,
+.hero-footer {
+    background: var(--bg-card, rgba(10,10,10,0.75));
+    border: 1px solid var(--border-color, rgba(255,255,255,0.25));
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-radius: 24px;
+    padding: 60px 50px;
+    margin: 80px auto;
+    width: 90%;
+}
+
+/* =========================
+   INTRO
+========================= */
+.intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.intro h3 {
+    font-size: 30px;
+    margin-bottom: 15px;
+}
+
+.intro p {
+    color: var(--text-secondary, #d1d1d1);
+    line-height: 1.6;
+}
+
+.intro-img {
+    width: 100%;
+    border-radius: 18px;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+/* RESPIRAR al pasar el mouse */
+.intro-img:hover {
+    animation: respirar 3s ease-in-out infinite;
+}
+
+/* KEYFRAMES para respirar */
+@keyframes respirar {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* =========================
+   SERVICIOS
+========================= */
+.servicios-section h2 {
+    font-size: 36px;
+    margin-bottom: 50px;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+.servicios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+}
+
+/* CARD */
+.servicio-card {
+    background: var(--bg-card, rgba(0,0,0,0.6));
+    border: 1px solid var(--border-color, rgba(255,255,255,0.2));
+    border-radius: 20px;
+    padding: 30px;
+    transition: all 0.35s ease;
+}
+
+.servicio-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(255,255,255,0.5);
+}
+
+.servicio-card h3 {
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.precio-line {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.desc {
+    font-size: 14px;
+    color: var(--text-secondary, #cfcfcf);
+    margin-bottom: 20px;
+}
+
+/* =========================
+   BOTONES
+========================= */
+.btn-primary {
+    background: transparent;
+    color: var(--text-primary, #ffffff);
+    padding: 12px 22px;
+    border-radius: 14px;
+    border: 1px solid var(--border-color, rgba(255,255,255,0.6));
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: var(--accent, #ffffff);
+    color: var(--accent-hover, #000000);
+}
+
+.btn-secondary {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-primary, #ffffff);
+    padding: 12px 22px;
+    border-radius: 14px;
+    border: 1px solid var(--border-color, rgba(255,255,255,0.4));
+    text-decoration: none;
+    transition: 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: var(--accent, #ffffff);
+    color: var(--accent-hover, #000000);
+}
+
+/* =========================
+   HERO FOOTER
+========================= */
+.hero-footer {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.hero-footer__img {
+    width: 100%;
+    border-radius: 22px;
+    object-fit: cover; 
+    animation: respirar 6s ease-in-out infinite;
+}
+
+@keyframes respirar {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.03); /* aumenta 3% */
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.hero-footer__card h3 {
+    font-size: 32px;
+    margin-bottom: 10px;
+    
+}
+
+.hero-footer__card p {
+    color: var(--text-secondary, #d0d0d0);
+    margin-bottom: 25px;
+}
+
+/* =========================
+   REDES
+========================= */
+.redes-section {
+    text-align: center;
+    margin: 100px 0 40px;
+}
+
+.redes img {
+    width: 28px;
+    margin: 0 12px;
+    opacity: 0.8;
+    transition: 0.3s;
+}
+
+.redes img:hover {
+    opacity: 1;
+}
+
+/* =========================
+   UTILIDADES
+========================= */
+.eco {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Tema claro - cambiar a negro */
+[data-theme="light"] .eco {
+    color: #000000;
+}
+
+/* =========================
+   RESPONSIVE COMPLETO
+========================= */
+
+/* Desktop Grande (1920px+) */
+@media (min-width: 1920px) {
+    .hero h1 {
+        font-size: 96px;
+        letter-spacing: 8px;
+    }
+    
+    .hero h2 {
+        font-size: 24px;
+        max-width: 800px;
+    }
+    
+    .servicios-grid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 40px;
+    }
+    
+    .servicio-card {
+        padding: 40px;
+    }
+}
+
+/* Desktop Normal (1200px - 1919px) */
+@media (min-width: 1200px) and (max-width: 1919px) {
+    .hero h1 {
+        font-size: 80px;
+        letter-spacing: 7px;
+    }
+    
+    .servicios-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 35px;
+    }
+}
+
+/* Laptop/Tablet Grande (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .hero h1 {
+        font-size: 64px;
+        letter-spacing: 6px;
+    }
+    
+    .hero h2 {
+        font-size: 18px;
+    }
+    
+    .servicios-grid {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 30px;
+    }
+    
+    .intro,
+    .hero-footer {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .intro-img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+/* Tablet (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .container {
+        padding: 0 30px;
+    }
+    
+    .hero {
+        padding: 80px 30px;
+        min-height: 70vh;
+    }
+    
+    .hero h1 {
+        font-size: 56px;
+        letter-spacing: 5px;
+    }
+    
+    .hero h2 {
+        font-size: 16px;
+        line-height: 1.4;
+    }
+    
+    .servicios-section {
+        padding: 40px 20px;
+    }
+    
+    .servicios-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 25px;
+    }
+    
+    .servicio-card {
+        padding: 25px;
+    }
+    
+    .intro,
+    .hero-footer {
+        grid-template-columns: 1fr;
+        gap: 25px;
+        text-align: center;
+    }
+    
+    .intro h3,
+    .hero-footer__card h3 {
+        font-size: 28px;
+        text-align: center;
+    }
+    
+    .intro p,
+    .hero-footer__card p {
+        font-size: 15px;
+        text-align: center;
+    }
+}
+
+/* Móvil Grande (576px - 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+    .container {
+        padding: 0 20px;
+    }
+    
+    .hero {
+        padding: 60px 20px;
+        min-height: 60vh;
+        text-align: center;
+    }
+    
+    .hero h1 {
+        font-size: 48px;
+        letter-spacing: 4px;
+        text-align: center;
+    }
+    
+    .hero h2 {
+        font-size: 15px;
+        line-height: 1.5;
+        text-align: center;
+        max-width: 100%;
+    }
+    
+    .hero .btn-primary {
+        margin: 30px auto 0;
+        display: inline-block;
+    }
+    
+    .servicios-section {
+        padding: 30px 15px;
+        margin: 40px auto;
+    }
+    
+    .servicios-section h2 {
+        font-size: 32px;
+        margin-bottom: 30px;
+    }
+    
+    .servicios-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    
+    .servicio-card {
+        padding: 20px;
+        text-align: center;
+    }
+    
+    .servicio-card h3 {
+        font-size: 18px;
+    }
+    
+    .precio-line {
+        font-size: 22px;
+    }
+    
+    .desc {
+        font-size: 13px;
+    }
+    
+    .intro,
+    .hero-footer {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 40px 20px;
+        text-align: center;
+    }
+    
+    .intro h3,
+    .hero-footer__card h3 {
+        font-size: 24px;
+        text-align: center;
+    }
+    
+    .intro p,
+    .hero-footer__card p {
+        font-size: 14px;
+        text-align: center;
+    }
+    
+    .intro-img {
+        max-width: 280px;
+        margin: 0 auto;
+    }
+    
+    .hero-footer__img {
+        max-width: 250px;
+        margin: 0 auto;
+    }
+    
+    .hero-footer__actions {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .hero-footer__actions .btn-primary,
+    .hero-footer__actions .btn-secondary {
+        width: 100%;
+        max-width: 200px;
+        text-align: center;
+    }
+}
+
+/* Móvil Pequeño (480px - 575px) */
+@media (min-width: 480px) and (max-width: 575px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .hero {
+        padding: 50px 15px;
+        min-height: 50vh;
+    }
+    
+    .hero h1 {
+        font-size: 42px;
+        letter-spacing: 3px;
+    }
+    
+    .hero h2 {
+        font-size: 14px;
+        padding: 0 10px;
+    }
+    
+    .servicios-section {
+        padding: 25px 10px;
+        margin: 30px auto;
+    }
+    
+    .servicios-section h2 {
+        font-size: 28px;
+        margin-bottom: 25px;
+    }
+    
+    .servicios-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .servicio-card {
+        padding: 18px;
+    }
+    
+    .intro,
+    .hero-footer {
+        padding: 30px 15px;
+        margin: 30px auto;
+    }
+    
+    .intro h3,
+    .hero-footer__card h3 {
+        font-size: 22px;
+    }
+    
+    .intro p,
+    .hero-footer__card p {
+        font-size: 13px;
+    }
+    
+    .intro-img {
+        max-width: 240px;
+    }
+    
+    .hero-footer__img {
+        max-width: 200px;
+    }
+}
+
+/* Móvil Extra Pequeño (320px - 479px) */
+@media (max-width: 479px) {
+    .container {
+        padding: 0 10px;
+    }
+    
+    .hero {
+        padding: 40px 10px;
+        min-height: 45vh;
+    }
+    
+    .hero h1 {
+        font-size: 36px;
+        letter-spacing: 2px;
+        line-height: 1.1;
+    }
+    
+    .hero h2 {
+        font-size: 13px;
+        line-height: 1.4;
+        padding: 0 5px;
+    }
+    
+    .hero .btn-primary {
+        font-size: 14px;
+        padding: 10px 18px;
+    }
+    
+    .servicios-section {
+        padding: 20px 8px;
+        margin: 25px auto;
+        width: 95%;
+    }
+    
+    .servicios-section h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        letter-spacing: 1px;
+    }
+    
+    .servicios-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .servicio-card {
+        padding: 15px;
+        border-radius: 16px;
+    }
+    
+    .servicio-card h3 {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    
+    .precio-line {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+    
+    .desc {
+        font-size: 12px;
+        margin-bottom: 15px;
+    }
+    
+    .servicio-card .btn-primary {
+        font-size: 13px;
+        padding: 8px 16px;
+    }
+    
+    .intro,
+    .hero-footer {
+        padding: 25px 10px;
+        margin: 25px auto;
+        width: 95%;
+        border-radius: 20px;
+    }
+    
+    .intro h3,
+    .hero-footer__card h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+    
+    .intro p,
+    .hero-footer__card p {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+    
+    .intro-img {
+        max-width: 200px;
+        margin: 15px auto 0;
+    }
+    
+    .hero-footer__img {
+        max-width: 180px;
+        margin: 15px auto 0;
+    }
+    
+    .hero-footer__actions {
+        gap: 12px;
+        margin-top: 20px;
+    }
+    
+    .hero-footer__actions .btn-primary,
+    .hero-footer__actions .btn-secondary {
+        font-size: 13px;
+        padding: 8px 14px;
+    }
+    
+    .redes-section {
+        margin: 60px 0 30px;
+    }
+    
+    .redes-section h2 {
+        font-size: 20px;
+    }
+    
+    .redes img {
+        width: 24px;
+        margin: 0 8px;
+    }
+    
+    #final {
+        font-size: 14px;
+        padding: 0 10px;
+    }
+}
+
+/* Optimizaciones para pantallas ultra anchas */
+@media (min-width: 2560px) {
+    .container {
+        max-width: 2000px;
+    }
+    
+    .servicios-section {
+        max-width: 1800px;
+    }
+}
+
+/* Ajustes para orientation horizontal en móviles */
+@media (max-height: 500px) and (orientation: landscape) {
+    .hero {
+        min-height: 80vh;
+        padding: 30px 15px;
+    }
+    
+    .hero h1 {
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+    
+    .hero h2 {
+        font-size: 12px;
+        margin-bottom: 15px;
+    }
+}

@@ -1,0 +1,45 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block title %}Productos de Cafetería · Administración{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+<link rel="stylesheet" href="{% static 'css/cafeteria.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="container">
+        <div class="admin-header">
+            <h1>🍽️ Productos de Cafetería</h1>
+            <div class="header-actions">
+                {% if user.is_superuser or user.perfil.rol == 'admin' %}
+                <a href="{% url 'admin_categoria_create' %}" class="btn-secondary">
+                    📂 Gestionar Categorías
+                </a>
+                {% endif %}
+                <a href="{% url 'admin_producto_create' %}" class="btn-primary">
+                    ➕ Nuevo Producto
+                </a>
+            </div>
+        </div>
+
+        {% if productos %}
+            <div class="productos-admin-grid">
+                {% for producto in productos %}
+                    <div class="producto-admin-card">
+                        <h3>{{ producto.nombre }}</h3>
+                        <p>Precio: ${{ producto.precio }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-data">
+                <h2>📭 No hay productos registrados</h2>
+                <p>Comienza agregando productos a tu menú de cafetería.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

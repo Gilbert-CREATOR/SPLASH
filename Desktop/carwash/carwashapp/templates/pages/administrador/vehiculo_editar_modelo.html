@@ -1,0 +1,20 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block title %}Editar modelo{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/vehiculo.css' %}">{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1>Editar modelo</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-2">{{ form.marca }}</div>
+        <div class="mb-2">{{ form.nombre }}</div>
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a href="{% url 'vehiculos_admin' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

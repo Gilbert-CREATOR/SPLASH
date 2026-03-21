@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recordatorio de Cita - B&B Car Wash</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .reminder-box {
+            background: #FFF3E0;
+            border-left: 4px solid #FF9800;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .reminder-box h3 {
+            margin: 0 0 15px 0;
+            color: #FF9800;
+            font-size: 24px;
+        }
+        .cita-info {
+            background: #f9f9f9;
+            border-left: 4px solid #FF9800;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .cita-info h3 {
+            margin: 0 0 15px 0;
+            color: #FF9800;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 5px 0;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #666;
+        }
+        .info-value {
+            color: #333;
+        }
+        .footer {
+            background: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #FF9800;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background: #F57C00;
+        }
+        .countdown {
+            font-size: 32px;
+            font-weight: bold;
+            color: #FF5722;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⏰ B&B Car Wash</h1>
+            <p>Recordatorio de Cita</p>
+        </div>
+        
+        <div class="content">
+            <div class="reminder-box">
+                <h3>¡TU CITA ES MAÑANA!</h3>
+                <div class="countdown">⏰ {{ hora_formateada }}</div>
+                <p>No te olvides de tu cita con nosotros</p>
+            </div>
+            
+            <h2>¡Hola {{ nombre_cliente }}!</h2>
+            <p>Este es un amigable recordatorio de tu cita programada para mañana.</p>
+            
+            <div class="cita-info">
+                <h3>📅 Detalles de tu Cita</h3>
+                <div class="info-row">
+                    <span class="info-label">Servicio:</span>
+                    <span class="info-value">{{ servicio.nombre }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Fecha:</span>
+                    <span class="info-value">{{ fecha_formateada }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Hora:</span>
+                    <span class="info-value">{{ hora_formateada }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Precio:</span>
+                    <span class="info-value">${{ servicio.precio }}</span>
+                </div>
+            </div>
+            
+            <h3>🚗 Prepara tu Vehículo</h3>
+            <ul>
+                <li>Retira objetos personales y de valor</li>
+                <li>Asegúrate de tener suficiente combustible</li>
+                <li>Si necesitas cancelar, hazlo con al menos 2 horas de anticipación</li>
+            </ul>
+            
+            <h3>☕ ¿Quieres algo mientras esperas?</h3>
+            <p>Nuestra cafetería estará lista para atenderte con deliciosos productos mientras tu vehículo recibe nuestro tratamiento premium.</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="tel:+18091234567" class="btn">📞 Llamar si necesitas reagendar</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>¡Nos vemos mañana!</strong></p>
+            <p>📞 Teléfono: (809) 123-4567</p>
+            <p>📍 Dirección: Calle Principal #123, Santo Domingo</p>
+            <p>🌐 www.bbcarwash.com</p>
+            
+            <p style="font-size: 12px; margin-top: 20px;">
+                Este es un mensaje automático. Para cancelar, responde "CANCELAR" o llama a nuestro número.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

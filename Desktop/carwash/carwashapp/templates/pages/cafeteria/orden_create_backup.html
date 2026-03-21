@@ -1,0 +1,221 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block title %}Crear Orden · Cafetería{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cafeteria.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="orden-page">
+    <div class="container">
+        <div class="orden-header">
+            <h1>🛒 Crear Orden</h1>
+            <p>Agrega los productos que deseas ordenar</p>
+            
+            {% if cita %}
+                <div class="cita-info">
+                    <strong>Orden para cita:</strong> {{ cita.servicio.nombre }} - {{ cita.fecha }} {{ cita.hora }}
+                </div>
+            {% endif %}
+        </div>
+
+        <form method="post" id="orden-form">
+            {% csrf_token %}
+            
+            <!-- Información del Cliente -->
+            <div class="form-section">
+                <h2>👤 Información del Cliente</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ orden_form.cliente_nombre.label_tag }}
+                        {{ orden_form.cliente_nombre }}
+                        {% if orden_form.cliente_nombre.errors %}
+                            <div class="error">{{ orden_form.cliente_nombre.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        {{ orden_form.cliente_telefono.label_tag }}
+                        {{ orden_form.cliente_telefono }}
+                        {% if orden_form.cliente_telefono.errors %}
+                            <div class="error">{{ orden_form.cliente_telefono.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selección de Productos -->
+            <div class="form-section">
+                <h2>🍽️ Seleccionar Productos</h2>
+                
+                <div class="productos-selector">
+                    {% for producto in productos %}
+                        <div class="producto-selector-item">
+                            <div class="producto-info">
+                                <h4>{{ producto.nombre }}</h4>
+                                <p>{{ producto.descripcion|default:"Sin descripción" }}</p>
+                                <span class="precio">${{ producto.precio }}</span>
+                                {% if producto.stock <= 5 %}
+                                    <span class="stock-bajo">⚠️ Solo {{ producto.stock }} disponibles</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="producto-controls">
+                                <div class="cantidad-control">
+                                    <button type="button" class="btn-cantidad btn-menos" 
+                                            data-producto="{{ producto.id }}">-</button>
+                                    <input type="number" class="cantidad-input" 
+                                           name="cantidades_{{ producto.id }}" 
+                                           id="cantidad_{{ producto.id }}" 
+                                           value="0" min="0" max="{{ producto.stock }}" readonly>
+                                    <button type="button" class="btn-cantidad btn-mas" 
+                                            data-producto="{{ producto.id }}">+</button>
+                                </div>
+                                
+                                <input type="hidden" name="productos" value="{{ producto.id }}" 
+                                       id="producto_{{ producto.id }}" data-precio="{{ producto.precio }}">
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Resumen de la orden -->
+                <div class="orden-resumen">
+                    <h3>📋 Resumen de la Orden</h3>
+                    <div id="resumen-items">
+                        <p>No hay productos seleccionados</p>
+                    </div>
+                    <div class="resumen-totales">
+                        <div class="total-line">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">$0.00</span>
+                        </div>
+                        <div class="total-line">
+                            <span>ITBIS (16%):</span>
+                            <span id="impuesto">$0.00</span>
+                        </div>
+                        <div class="total-line total-final">
+                            <span>Total:</span>
+                            <span id="total">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notas Adicionales -->
+            <div class="form-section">
+                <h2>📝 Notas Adicionales</h2>
+                <div class="form-group">
+                    {{ orden_form.notas.label_tag }}
+                    {{ orden_form.notas }}
+                    {% if orden_form.notas.errors %}
+                        <div class="error">{{ orden_form.notas.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="form-actions">
+                <a href="{% url 'cafeteria_menu' %}" class="btn-secondary">
+                    ← Cancelar
+                </a>
+                <button type="submit" class="btn-primary" id="btn-submit" disabled>
+                    🛒 Crear Orden
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Sistema de selección de productos
+let productosSeleccionados = {};
+
+function actualizarCantidad(productoId, cambio) {
+    const cantidadInput = document.getElementById(`cantidad_${productoId}`);
+    const precio = parseFloat(document.getElementById(`producto_${productoId}`).dataset.precio);
+    const stockMax = parseInt(cantidadInput.max);
+    
+    let nuevaCantidad = parseInt(cantidadInput.value) + cambio;
+    
+    if (nuevaCantidad < 0) nuevaCantidad = 0;
+    if (nuevaCantidad > stockMax) nuevaCantidad = stockMax;
+    
+    cantidadInput.value = nuevaCantidad;
+    
+    if (nuevaCantidad > 0) {
+        productosSeleccionados[productoId] = {
+            cantidad: nuevaCantidad,
+            precio: precio,
+            nombre: document.querySelector(`label[for="cantidad_${productoId}"]`).textContent.trim()
+        };
+    } else {
+        delete productosSeleccionados[productoId];
+    }
+    
+    actualizarResumen();
+}
+
+function actualizarResumen() {
+    const resumenItems = document.getElementById('resumen-items');
+    const subtotalEl = document.getElementById('subtotal');
+    const impuestoEl = document.getElementById('impuesto');
+    const totalEl = document.getElementById('total');
+    const btnSubmit = document.getElementById('btn-submit');
+    
+    if (Object.keys(productosSeleccionados).length === 0) {
+        resumenItems.innerHTML = '<p>No hay productos seleccionados</p>';
+        subtotalEl.textContent = '$0.00';
+        impuestoEl.textContent = '$0.00';
+        totalEl.textContent = '$0.00';
+        btnSubmit.disabled = true;
+        return;
+    }
+    
+    let html = '';
+    let subtotal = 0;
+    
+    Object.entries(productosSeleccionados).forEach(([productoId, item]) => {
+        const itemTotal = item.cantidad * item.precio;
+        html += `
+            <div class="resumen-item">
+                <span>${item.cantidad}x ${item.nombre}</span>
+                <span>$${itemTotal.toFixed(2)}</span>
+            </div>
+        `;
+        subtotal += itemTotal;
+    });
+    
+    const impuesto = subtotal * 0.16;
+    const total = subtotal + impuesto;
+    
+    resumenItems.innerHTML = html;
+    subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+    impuestoEl.textContent = `$${impuesto.toFixed(2)}`;
+    totalEl.textContent = `$${total.toFixed(2)}`;
+    btnSubmit.disabled = false;
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Botones de cantidad
+    document.querySelectorAll('.btn-cantidad').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productoId = this.dataset.producto;
+            const cambio = this.classList.contains('btn-mas') ? 1 : -1;
+            actualizarCantidad(productoId, cambio);
+        });
+    });
+    
+    // Validación del formulario
+    document.getElementById('orden-form').addEventListener('submit', function(e) {
+        if (Object.keys(productosSeleccionados).length === 0) {
+            e.preventDefault();
+            alert('Por favor selecciona al menos un producto');
+        }
+    });
+});
+</script>
+{% endblock %}

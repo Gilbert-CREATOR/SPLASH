@@ -1,0 +1,399 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block title %}Orden #{{ orden.id }} · Cafetería{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cafeteria.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="orden-detalle-page">
+    <div class="container">
+        <!-- Header de la Orden -->
+        <div class="orden-header">
+            <div class="orden-info">
+                <h1>🛒 Orden #{{ orden.id }}</h1>
+                <div class="orden-meta">
+                    <span class="orden-fecha">
+                        📅 {{ orden.fecha_hora|date:"d/m/Y H:i" }}
+                    </span>
+                    <span class="orden-estado estado-{{ orden.estado }}">
+                        {{ orden.get_estado_display }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="orden-actions">
+                {% if user.is_staff and orden.estado != 'entregado' and orden.estado != 'cancelado' %}
+                    {% if orden.estado == 'pendiente' %}
+                        <a href="{% url 'cafeteria_cambiar_estado' orden.id 'en_preparacion' %}" 
+                           class="btn-warning">
+                            👨‍🍳 Iniciar Preparación
+                        </a>
+                    {% elif orden.estado == 'en_preparacion' %}
+                        <a href="{% url 'cafeteria_cambiar_estado' orden.id 'listo' %}" 
+                           class="btn-success">
+                            ✅ Marcar como Listo
+                        </a>
+                    {% elif orden.estado == 'listo' %}
+                        <a href="{% url 'cafeteria_cambiar_estado' orden.id 'entregado' %}" 
+                           class="btn-primary">
+                            📦 Entregar Orden
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'cafeteria_cambiar_estado' orden.id 'cancelado' %}" 
+                       class="btn-danger" 
+                       onclick="return confirm('¿Estás seguro de cancelar esta orden?')">
+                        ❌ Cancelar
+                    </a>
+                {% endif %}
+                
+                {% if orden.cita %}
+                    <a href="{% url 'factura_crear' orden.cita.id %}" 
+                       class="btn-factura">
+                        Crear Factura
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Información del Cliente -->
+        <div class="cliente-info">
+            <h2>👤 Información del Cliente</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>Nombre:</strong> {{ orden.cliente_nombre }}
+                </div>
+                {% if orden.cliente_telefono %}
+                    <div class="info-item">
+                        <strong>Teléfono:</strong> {{ orden.cliente_telefono }}
+                    </div>
+                {% endif %}
+                {% if orden.cita %}
+                    <div class="info-item">
+                        <strong>Cita relacionada:</strong>
+                        {{ orden.cita.servicio.nombre }} - {{ orden.cita.fecha }} {{ orden.cita.hora }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Detalles de la Orden -->
+        <div class="detalles-orden">
+            <h2>🍽️ Detalles de la Orden</h2>
+            
+            <div class="productos-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Subtotal</th>
+                            {% if orden.notas %}
+                            <th>Notas</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for detalle in detalles %}
+                            <tr>
+                                <td>
+                                    <div class="producto-cell">
+                                        <strong>{{ detalle.producto.nombre }}</strong>
+                                        {% if detalle.producto.descripcion %}
+                                            <br><small>{{ detalle.producto.descripcion|truncatewords:10 }}</small>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="text-center">{{ detalle.cantidad }}</td>
+                                <td class="text-right">${{ detalle.precio_unitario }}</td>
+                                <td class="text-right subtotal-cell">${{ detalle.subtotal }}</td>
+                                {% if orden.notas %}
+                                <td class="notas-cell">
+                                    {% if detalle.notas %}
+                                        {{ detalle.notas }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                {% endif %}
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="{% if orden.notas %}5{% else %}4{% endif %}" class="text-center">
+                                    No hay productos en esta orden
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Totales -->
+            <div class="totales-section">
+                <div class="totales-grid">
+                    <div class="total-item">
+                        <span>Subtotal:</span>
+                        <span>${{ orden.subtotal }}</span>
+                    </div>
+                    <div class="total-item">
+                        <span>ITBIS (16%):</span>
+                        <span>${{ orden.impuesto }}</span>
+                    </div>
+                    <div class="total-item total-final">
+                        <span>Total:</span>
+                        <span>${{ orden.total }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notas Adicionales -->
+        {% if orden.notas %}
+            <div class="notas-section">
+                <h2>📝 Notas Adicionales</h2>
+                <div class="notas-content">
+                    {{ orden.notas|linebreaks }}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Información de Entrega -->
+        {% if orden.estado == 'entregado' and orden.entregado_por %}
+            <div class="entrega-info">
+                <h2>✅ Información de Entrega</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Entregado por:</strong> {{ orden.entregado_por.get_full_name|default:orden.entregado_por.username }}
+                    </div>
+                    <div class="info-item">
+                        <strong>Fecha de entrega:</strong> {{ orden.fecha_hora|date:"d/m/Y H:i" }}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Acciones -->
+        <div class="acciones-section">
+            <div class="acciones-grid">
+                <a href="{% url 'cafeteria_menu' %}" class="btn-secondary">
+                    ← Volver al Menú
+                </a>
+                
+                {% if user.is_staff %}
+                    <a href="{% url 'cafeteria_ordenes_activas' %}" class="btn-info">
+                        📋 Ver Órdenes Activas
+                    </a>
+                {% endif %}
+                
+                {% if orden.cita %}
+                    <a href="{% url 'dashboard_cita_detalle' orden.cita.id %}" class="btn-primary">
+                        🚗 Ver Cita Relacionada
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos específicos para esta página */
+.orden-detalle-page {
+    padding: 20px 0;
+}
+
+.orden-header {
+    background: var(--bg-card);
+    padding: 30px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.orden-info h1 {
+    margin: 0 0 10px 0;
+    color: var(--text-primary);
+}
+
+.orden-meta {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.orden-fecha {
+    color: var(--text-secondary);
+}
+
+.orden-estado {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.estado-pendiente { background: var(--warning-bg); color: var(--text-primary); }
+.estado-en_preparacion { background: var(--info-bg); color: var(--text-primary); }
+.estado-listo { background: var(--success-bg); color: var(--text-primary); }
+.estado-entregado { background: var(--accent); color: var(--accent-hover); }
+.estado-cancelado { background: var(--error-bg); color: var(--text-primary); }
+
+.orden-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cliente-info, .detalles-orden, .notas-section, .entrega-info {
+    background: var(--bg-card);
+    padding: 30px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+}
+
+.cliente-info h2, .detalles-orden h2, .notas-section h2, .entrega-info h2 {
+    margin: 0 0 20px 0;
+    color: var(--text-primary);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.info-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.productos-table {
+    overflow-x: auto;
+    margin-bottom: 30px;
+}
+
+.productos-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.productos-table th,
+.productos-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.productos-table th {
+    background: var(--bg-input);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.producto-cell strong {
+    color: var(--text-primary);
+}
+
+.producto-cell small {
+    color: var(--text-secondary);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.subtotal-cell {
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.totales-section {
+    background: var(--bg-input);
+    padding: 25px;
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+.totales-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.total-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 200px;
+}
+
+.total-final {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--accent);
+    border-top: 2px solid var(--accent);
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+.notas-content {
+    background: var(--bg-input);
+    padding: 20px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+}
+
+.acciones-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.acciones-grid {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .orden-header {
+        flex-direction: column;
+    }
+    
+    .orden-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .totales-grid {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .acciones-grid {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .acciones-grid .btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}

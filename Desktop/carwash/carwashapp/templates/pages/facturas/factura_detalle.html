@@ -1,0 +1,279 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block title %}Factura #{{ factura.numero_factura }} · B&B Car Wash{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/factura.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="factura-page">
+    <div class="container">
+        <!-- Encabezado de la Factura -->
+        <div class="factura-header">
+            <div class="factura-logo">
+                <h1>🧾 B&B Car Wash</h1>
+                <p>Car Wash a Domicilio & Cafetería</p>
+            </div>
+            
+            <div class="factura-info">
+                <div class="factura-numero">
+                    <strong>Factura #{{ factura.numero_factura }}</strong>
+                </div>
+                <div class="factura-fecha">
+                    <strong>Fecha de Emisión:</strong><br>
+                    {{ factura.fecha_emision|date:"d/m/Y H:i" }}
+                </div>
+                <div class="factura-estado">
+                    <span class="estado-{{ factura.estado }}">
+                        {{ factura.get_estado_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del Cliente -->
+        <div class="factura-cliente">
+            <h2>👤 Datos del Cliente</h2>
+            <div class="cliente-grid">
+                <div class="cliente-item">
+                    <strong>Nombre:</strong> {{ factura.cliente_nombre }}
+                </div>
+                <div class="cliente-item">
+                    <strong>Teléfono:</strong> {{ factura.cliente_telefono }}
+                </div>
+                {% if factura.cliente_email %}
+                    <div class="cliente-item">
+                        <strong>Email:</strong> {{ factura.cliente_email }}
+                    </div>
+                {% endif %}
+                <div class="cliente-item">
+                    <strong>Método de Pago:</strong> 
+                    <span class="metodo-pago metodo-{{ factura.metodo_pago }}">
+                        {{ factura.get_metodo_pago_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalles de la Factura -->
+        <div class="factura-detalles">
+            <h2>📋 Detalles de la Factura</h2>
+            
+            <!-- Servicios de Car Wash -->
+            <div class="factura-seccion">
+                <h3>🚗 Servicios de Car Wash</h3>
+                {% if factura.cita %}
+                    <table class="factura-table">
+                        <thead>
+                            <tr>
+                                <th>Servicio</th>
+                                <th>Descripción</th>
+                                <th>Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ factura.cita.servicio.nombre }}</td>
+                                <td>
+                                    {% if factura.cita.marca and factura.cita.modelo %}
+                                        {{ factura.cita.marca.nombre }} {{ factura.cita.modelo.nombre }}
+                                    {% else %}
+                                        Servicio general
+                                    {% endif %}
+                                    <br>
+                                    <small>{{ factura.cita.fecha }} {{ factura.cita.hora }}</small>
+                                </td>
+                                <td class="text-right">${{ factura.cita.servicio.precio }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="no-items">No hay servicios de car wash en esta factura</p>
+                {% endif %}
+            </div>
+
+            <!-- Productos de Cafetería -->
+            <div class="factura-seccion">
+                <h3>☕ Cafetería & Bar</h3>
+                {% if factura.orden_cafeteria %}
+                    <table class="factura-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for detalle in factura.orden_cafeteria.detalles.all %}
+                                <tr>
+                                    <td>{{ detalle.producto.nombre }}</td>
+                                    <td class="text-center">{{ detalle.cantidad }}</td>
+                                    <td class="text-right">${{ detalle.precio_unitario }}</td>
+                                    <td class="text-right">${{ detalle.subtotal }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="no-items">No hay productos de cafetería en esta factura</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Resumen de Totales -->
+        <div class="factura-totales">
+            <h2>💰 Resumen de Totales</h2>
+            
+            <div class="totales-grid">
+                <div class="totales-seccion">
+                    <h4>Car Wash</h4>
+                    <div class="total-item">
+                        <span>Subtotal:</span>
+                        <span>${{ factura.subtotal_servicios }}</span>
+                    </div>
+                    <div class="total-item">
+                        <span>ITBIS (16%):</span>
+                        <span>${{ factura.impuesto_servicios }}</span>
+                    </div>
+                </div>
+                
+                {% if factura.tiene_cafeteria %}
+                    <div class="totales-seccion">
+                        <h4>Cafetería</h4>
+                        <div class="total-item">
+                            <span>Subtotal:</span>
+                            <span>${{ factura.subtotal_cafeteria }}</span>
+                        </div>
+                        <div class="total-item">
+                            <span>ITBIS (16%):</span>
+                            <span>${{ factura.impuesto_cafeteria }}</span>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="totales-seccion total-final">
+                    <h4>Total General</h4>
+                    <div class="total-item">
+                        <span>Subtotal Total:</span>
+                        <span>${{ factura.subtotal_total }}</span>
+                    </div>
+                    <div class="total-item">
+                        <span>ITBIS Total:</span>
+                        <span>${{ factura.impuesto_total }}</span>
+                    </div>
+                    <div class="total-item gran-total">
+                        <span>Total a Pagar:</span>
+                        <span>${{ factura.total_factura }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notas Adicionales -->
+        {% if factura.notas %}
+            <div class="factura-notas">
+                <h2>📝 Notas Adicionales</h2>
+                <div class="notas-content">
+                    {{ factura.notas|linebreaks }}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Información de Pago -->
+        <div class="factura-pago">
+            <h2>💳 Información de Pago</h2>
+            <div class="pago-grid">
+                <div class="pago-item">
+                    <strong>Estado:</strong>
+                    <span class="estado-{{ factura.estado }}">
+                        {{ factura.get_estado_display }}
+                    </span>
+                </div>
+                <div class="pago-item">
+                    <strong>Método:</strong>
+                    <span class="metodo-pago metodo-{{ factura.metodo_pago }}">
+                        {{ factura.get_metodo_pago_display }}
+                    </span>
+                </div>
+                {% if factura.fecha_pago %}
+                    <div class="pago-item">
+                        <strong>Fecha de Pago:</strong>
+                        {{ factura.fecha_pago|date:"d/m/Y H:i" }}
+                    </div>
+                {% endif %}
+                {% if factura.emitida_por %}
+                    <div class="pago-item">
+                        <strong>Emitida por:</strong>
+                        {{ factura.emitida_por.get_full_name|default:factura.emitida_por.username }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="factura-acciones">
+            <div class="acciones-grid">
+                {% if user.is_staff and factura.estado != 'pagada' %}
+                    <a href="{% url 'factura_pagar' factura.id %}" 
+                       class="btn-success"
+                       onclick="return confirm('¿Estás seguro de marcar esta factura como pagada?')">
+                        💰 Marcar como Pagada
+                    </a>
+                {% endif %}
+                
+                <button onclick="window.print()" class="btn-primary">
+                    🖨️ Imprimir Factura
+                </button>
+                
+                <a href="{% if user.is_staff %}{% url 'factura_list' %}{% else %}{% url 'facturas' %}{% endif %}" 
+                   class="btn-secondary">
+                    ← Volver a Facturas
+                </a>
+                
+                {% if factura.cita %}
+                    <a href="{% url 'dashboard_cita_detalle' factura.cita.id %}" 
+                       class="btn-info">
+                        🚗 Ver Cita
+                    </a>
+                {% endif %}
+                
+                {% if factura.orden_cafeteria %}
+                    <a href="{% url 'cafeteria_orden_detalle' factura.orden_cafeteria.id %}" 
+                       class="btn-warning">
+                        ☕ Ver Orden Cafetería
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estilos para impresión -->
+<style>
+@media print {
+    .factura-acciones {
+        display: none;
+    }
+    
+    .factura-page {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .factura-header,
+    .factura-cliente,
+    .factura-detalles,
+    .factura-totales,
+    .factura-notas,
+    .factura-pago {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        page-break-inside: avoid;
+    }
+}
+</style>
+{% endblock %}

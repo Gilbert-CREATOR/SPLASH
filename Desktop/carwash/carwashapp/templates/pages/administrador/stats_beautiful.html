@@ -1,0 +1,959 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Estadísticas Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/stats.css' %}">
+<style>
+/* Estilos adicionales para hacer la página más hermosa */
+.stats-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.stats-hero h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.stats-hero p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.chart-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+    border-radius: 20px 20px 0 0;
+}
+
+.chart-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.chart-card h3 {
+    color: #2d3748;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chart-card h3::before {
+    content: '📊';
+    font-size: 1.5rem;
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 3rem 0;
+}
+
+.dashboard-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    color: white;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.dashboard-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+}
+
+.dashboard-card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.dashboard-card p {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.cafeteria-stats-section {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 30px;
+    padding: 3rem;
+    margin: 3rem 0;
+    color: white;
+    box-shadow: 0 20px 40px rgba(240, 147, 251, 0.3);
+}
+
+.cafeteria-stats-section h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.cafeteria-stats-section .dashboard-stats {
+    margin: 2rem 0;
+}
+
+.cafeteria-stats-section .dashboard-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.productos-mas-vendidos,
+.productos-populares {
+    margin: 3rem 0;
+}
+
+.productos-mas-vendidos h3,
+.productos-populares h3 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #2d3748;
+    text-align: center;
+}
+
+.productos-top-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.producto-top-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+    position: relative;
+}
+
+.producto-top-card::before {
+    content: '🏆';
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    font-size: 2rem;
+    transform: rotate(15deg);
+}
+
+.producto-top-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.producto-top-card h4 {
+    margin: 0 0 1rem 0;
+    color: #2d3748;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.ventas-count {
+    margin: 0;
+    color: #667eea;
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+.productos-populares-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.producto-popular-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.producto-popular-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.producto-imagen {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.producto-info h4 {
+    margin: 0 0 0.5rem 0;
+    color: #2d3748;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.producto-precio {
+    margin: 0;
+    color: #667eea;
+    font-weight: 700;
+    font-size: 1.4rem;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin-top: 1rem;
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chart-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.chart-card:nth-child(1) { animation-delay: 0.1s; }
+.chart-card:nth-child(2) { animation-delay: 0.2s; }
+.chart-card:nth-child(3) { animation-delay: 0.3s; }
+.chart-card:nth-child(4) { animation-delay: 0.4s; }
+.chart-card:nth-child(5) { animation-delay: 0.5s; }
+.chart-card:nth-child(6) { animation-delay: 0.6s; }
+.chart-card:nth-child(7) { animation-delay: 0.7s; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-hero h1 {
+        font-size: 2rem;
+    }
+    
+    .chart-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .productos-top-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .productos-populares-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .producto-popular-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .cafeteria-stats-section {
+        padding: 2rem;
+        margin: 2rem 0;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="stats-hero">
+    <h1>📊 Panel de Estadísticas</h1>
+    <p>Visualización completa del rendimiento de tu negocio en tiempo real</p>
+</div>
+
+<!-- Grid de Gráficos Principales -->
+<div class="chart-grid">
+    <!-- Ganancias totales -->
+    <div class="chart-card">
+        <h3>Ganancias Totales</h3>
+        <div class="chart-container">
+            <canvas id="gananciasTotalesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Ingresos diarios -->
+    <div class="chart-card">
+        <h3>Ingresos Diarios</h3>
+        <div class="chart-container">
+            <canvas id="ingresosDiariosChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Ingresos semanales -->
+    <div class="chart-card">
+        <h3>Ingresos Semanales</h3>
+        <div class="chart-container">
+            <canvas id="ingresosSemanalesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Citas por estado -->
+    <div class="chart-card">
+        <h3>Citas por Estado</h3>
+        <div class="chart-container">
+            <canvas id="citasPorEstadoChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Citas por servicio -->
+    <div class="chart-card">
+        <h3>Servicios Más Solicitados</h3>
+        <div class="chart-container">
+            <canvas id="citasPorServicioChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Citas por día -->
+    <div class="chart-card">
+        <h3>Tendencia Diaria</h3>
+        <div class="chart-container">
+            <canvas id="citasPorDiaChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Citas por servicio (cantidad) -->
+    <div class="chart-card">
+        <h3>Distribución de Servicios</h3>
+        <div class="chart-container">
+            <canvas id="citasPorServicioCantidadChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== ESTADÍSTICAS DE CAFETERÍA ==================== -->
+
+<div class="cafeteria-stats-section">
+    <h2>☕ Estadísticas de Cafetería</h2>
+    
+    <!-- Tarjetas de Estadísticas -->
+    <div class="dashboard-stats">
+        <div class="dashboard-card">
+            <h3>{{ total_ordenes|format_number }}</h3>
+            <p>Total de Órdenes</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>{{ ordenes_hoy|format_number }}</h3>
+            <p>Órdenes Hoy</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>{{ ingresos_cafeteria|format_currency }}</h3>
+            <p>Ingresos Totales</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>{{ productos_populares|length }}</h3>
+            <p>Productos Populares</p>
+        </div>
+    </div>
+
+    <!-- Gráficos adicionales de cafetería -->
+    <div class="chart-grid">
+        <!-- Productos más vendidos -->
+        <div class="chart-card">
+            <h3>🏆 Productos Más Vendidos</h3>
+            <div class="chart-container">
+                <canvas id="productosMasVendidosChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Categorías populares -->
+        <div class="chart-card">
+            <h3>📈 Categorías Populares</h3>
+            <div class="chart-container">
+                <canvas id="categoriasPopularesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Ingresos por día de cafetería -->
+        <div class="chart-card">
+            <h3>💰 Ingresos Diarios Cafetería</h3>
+            <div class="chart-container">
+                <canvas id="ingresosCafeteriaDiariosChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Horas más ocupadas -->
+        <div class="chart-card">
+            <h3>⏰ Horas Más Ocupadas</h3>
+            <div class="chart-container">
+                <canvas id="horasOcupadasChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Productos Más Vendidos -->
+    {% if productos_mas_vendidos %}
+    <div class="productos-mas-vendidos">
+        <h3>🏆 Top 5 Productos Más Vendidos</h3>
+        <div class="productos-top-grid">
+            {% for producto in productos_mas_vendidos %}
+            <div class="producto-top-card">
+                <h4>{{ producto.producto__nombre }}</h4>
+                <p class="ventas-count">{{ producto.total_vendido|format_number }} vendidos</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Productos Populares -->
+    {% if productos_populares %}
+    <div class="productos-populares">
+        <h3>⭐ Productos Destacados</h3>
+        <div class="productos-populares-grid">
+            {% for producto in productos_populares %}
+            <div class="producto-popular-card">
+                {% if producto.imagen %}
+                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="producto-imagen">
+                {% endif %}
+                <div class="producto-info">
+                    <h4>{{ producto.nombre }}</h4>
+                    <p class="producto-precio">{{ producto.precio|format_currency }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Colores personalizados más hermosos
+    const beautifulColors = {
+        primary: '#667eea',
+        secondary: '#764ba2',
+        accent: '#f093fb',
+        success: '#4ade80',
+        warning: '#fbbf24',
+        danger: '#f87171',
+        info: '#60a5fa',
+        purple: '#a78bfa',
+        pink: '#f472b6',
+        indigo: '#818cf8',
+        text: '#1f2937',
+        grid: '#e5e7eb',
+        bg: '#ffffff'
+    };
+
+    // Preparar datos de forma segura
+    const ingresosDiariosData = {{ ingresos_diarios|safe }};
+    const ingresosSemanalesData = {{ ingresos_semanales|safe }};
+    
+    // Extraer labels y valores
+    const ingresosDiariosLabels = ingresosDiariosData.map(item => item.fecha);
+    const ingresosDiariosValues = ingresosDiariosData.map(item => item.total);
+    
+    const ingresosSemanalesLabels = ingresosSemanalesData.map(item => item.label);
+    const ingresosSemanalesValues = ingresosSemanalesData.map(item => item.total);
+
+    // Configuración global de Chart.js
+    Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    Chart.defaults.color = beautifulColors.text;
+
+    // Ganancias totales - Doughnut con gradiente
+    new Chart(document.getElementById('gananciasTotalesChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Ganancias'],
+            datasets: [{
+                data: [{{ ganancias_totales|floatformat:2 }}],
+                backgroundColor: [
+                    'rgba(102, 126, 234, 0.8)',
+                    'rgba(118, 75, 162, 0.8)',
+                    'rgba(240, 147, 251, 0.8)'
+                ],
+                borderWidth: 0,
+                borderRadius: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    borderRadius: 8,
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 13 },
+                    callbacks: {
+                        label: function(context) {
+                            return 'Ganancias: $' + context.parsed.toFixed(2);
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Ingresos diarios - Línea con gradiente
+    new Chart(document.getElementById('ingresosDiariosChart'), {
+        type: 'line',
+        data: {
+            labels: ingresosDiariosLabels,
+            datasets: [{
+                label: 'Ingresos Diarios',
+                data: ingresosDiariosValues,
+                borderColor: beautifulColors.primary,
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: beautifulColors.primary,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { 
+                        color: beautifulColors.grid,
+                        drawBorder: false
+                    },
+                    ticks: { 
+                        color: beautifulColors.text,
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: beautifulColors.text }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    // Ingresos semanales - Barras con gradiente
+    new Chart(document.getElementById('ingresosSemanalesChart'), {
+        type: 'bar',
+        data: {
+            labels: ingresosSemanalesLabels,
+            datasets: [{
+                label: 'Ingresos Semanales',
+                data: ingresosSemanalesValues,
+                backgroundColor: 'rgba(118, 75, 162, 0.8)',
+                borderColor: 'rgba(118, 75, 162, 1)',
+                borderWidth: 0,
+                borderRadius: 8,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { 
+                        color: beautifulColors.grid,
+                        drawBorder: false
+                    },
+                    ticks: { 
+                        color: beautifulColors.text,
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: beautifulColors.text }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    // Citas por estado - Pie con colores hermosos
+    new Chart(document.getElementById('citasPorEstadoChart'), {
+        type: 'pie',
+        data: {
+            labels: {{ estados|safe }},
+            datasets: [{
+                data: {{ totales_estado|safe }},
+                backgroundColor: [
+                    beautifulColors.primary,
+                    beautifulColors.success,
+                    beautifulColors.warning,
+                    beautifulColors.danger,
+                    beautifulColors.info
+                ],
+                borderWidth: 2,
+                borderColor: '#fff',
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { 
+                        padding: 15,
+                        usePointStyle: true,
+                        font: { size: 12 }
+                    }
+                }
+            }
+        }
+    });
+
+    // Citas por servicio - Barras horizontales
+    new Chart(document.getElementById('citasPorServicioChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ nombres_servicios|safe }},
+            datasets: [{
+                label: 'Citas por Servicio',
+                data: {{ totales_servicios|safe }},
+                backgroundColor: 'rgba(240, 147, 251, 0.8)',
+                borderColor: 'rgba(240, 147, 251, 1)',
+                borderWidth: 0,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: { 
+                        color: beautifulColors.grid,
+                        drawBorder: false
+                    },
+                    ticks: { color: beautifulColors.text }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { color: beautifulColors.text }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    // Citas por día - Área con gradiente
+    new Chart(document.getElementById('citasPorDiaChart'), {
+        type: 'line',
+        data: {
+            labels: {{ dias|safe }},
+            datasets: [{
+                label: 'Citas por Día',
+                data: {{ totales_dia|safe }},
+                borderColor: beautifulColors.warning,
+                backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: beautifulColors.warning,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { 
+                        color: beautifulColors.grid,
+                        drawBorder: false
+                    },
+                    ticks: { color: beautifulColors.text }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: beautifulColors.text }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    // Citas por servicio (cantidad) - Doughnut
+    new Chart(document.getElementById('citasPorServicioCantidadChart'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ citas_por_servicio_nombres|safe }},
+            datasets: [{
+                data: {{ citas_por_servicio_totales|safe }},
+                backgroundColor: [
+                    beautifulColors.purple,
+                    beautifulColors.pink,
+                    beautifulColors.indigo,
+                    beautifulColors.info,
+                    beautifulColors.success
+                ],
+                borderWidth: 2,
+                borderColor: '#fff',
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { 
+                        padding: 15,
+                        usePointStyle: true,
+                        font: { size: 12 }
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráficos adicionales de cafetería
+    {% if productos_mas_vendidos %}
+    // Productos más vendidos - Barras
+    const productosMasVendidosLabels = [{% for producto in productos_mas_vendidos %}'{{ producto.producto__nombre }}'{% if not forloop.last %},{% endif %}{% endfor %}];
+    const productosMasVendidosData = [{% for producto in productos_mas_vendidos %}{{ producto.total_vendido }}{% if not forloop.last %},{% endif %}{% endfor %}];
+
+    new Chart(document.getElementById('productosMasVendidosChart'), {
+        type: 'bar',
+        data: {
+            labels: productosMasVendidosLabels,
+            datasets: [{
+                label: 'Unidades Vendidas',
+                data: productosMasVendidosData,
+                backgroundColor: 'rgba(74, 222, 128, 0.8)',
+                borderColor: 'rgba(74, 222, 128, 1)',
+                borderWidth: 0,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    ticks: { color: 'white' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: 'white' }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+    {% endif %}
+
+    // Categorías populares - Polar Area
+    new Chart(document.getElementById('categoriasPopularesChart'), {
+        type: 'polarArea',
+        data: {
+            labels: ['Bebidas', 'Snacks', 'Postres', 'Comidas', 'Otros'],
+            datasets: [{
+                data: [30, 25, 20, 15, 10],
+                backgroundColor: [
+                    'rgba(102, 126, 234, 0.7)',
+                    'rgba(240, 147, 251, 0.7)',
+                    'rgba(74, 222, 128, 0.7)',
+                    'rgba(251, 191, 36, 0.7)',
+                    'rgba(248, 113, 113, 0.7)'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    ticks: { color: 'white' }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: 'white' }
+                }
+            }
+        }
+    });
+
+    // Ingresos diarios cafetería - Línea
+    new Chart(document.getElementById('ingresosCafeteriaDiariosChart'), {
+        type: 'line',
+        data: {
+            labels: ingresosDiariosLabels,
+            datasets: [{
+                label: 'Ingresos Cafetería',
+                data: ingresosDiariosValues.map(v => v * 0.3), // Simulación
+                borderColor: beautifulColors.accent,
+                backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    ticks: { color: 'white' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: 'white' }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    // Horas más ocupadas - Barras
+    new Chart(document.getElementById('horasOcupadasChart'), {
+        type: 'bar',
+        data: {
+            labels: ['8-10', '10-12', '12-14', '14-16', '16-18', '18-20'],
+            datasets: [{
+                label: 'Órdenes por Hora',
+                data: [15, 35, 45, 38, 42, 25],
+                backgroundColor: 'rgba(96, 165, 250, 0.8)',
+                borderColor: 'rgba(96, 165, 250, 1)',
+                borderWidth: 0,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    ticks: { color: 'white' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: 'white' }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,205 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>{% block title %}B&B Car Wash · Lavado a domicilio{% endblock %}</title>
+
+    <link rel="stylesheet" href="{% static 'css/theme-global.css' %}">
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/pages-common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/responsive-fixes.css' %}">
+    <link rel="stylesheet" href="{% static 'css/mobile-optimizations.css' %}">
+    <link rel="stylesheet" href="{% static 'css/component-fixes.css' %}">
+    <link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="theme-dark" data-theme="dark">
+    <header class="site-header">
+        <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        
+        {% if user_role == "superuser" %}
+            {% include 'components/navbar_superadmin.html' %}
+        {% elif user_role == "admin" %}
+            {% include 'components/navbar_admin.html' %}
+        {% elif user_role == "empleado" %}
+            {% include 'components/navbar_empleado.html' %}
+        {% else %}
+            {% include 'components/navbar.html' %}
+        {% endif %}
+        
+        <div class="nav-overlay" id="nav-overlay"></div>
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema claro/oscuro">
+            <span class="theme-icon theme-icon-dark">
+                <img src="{% static 'img/sun-solid-full-2.svg' %}" alt="Tema oscuro" width="20" height="20">
+            </span>
+            <span class="theme-icon theme-icon-light" style="display: none;">
+                <img src="{% static 'img/moon-solid-full.svg' %}" alt="Tema claro" width="20" height="20">
+            </span>
+        </button>
+    </header>
+
+    <main>
+        {% block content %} {% endblock %}
+    </main>
+
+    <!-- Floating Notifications Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    {% if messages %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% for message in messages %}
+            (function() {
+                var msg = "{{ message|escapejs }}";
+                var type = "{{ message.tags }}";
+                if (typeof showNotification === 'function') {
+                    showNotification(msg, type);
+                }
+            })();
+            {% endfor %}
+        });
+    </script>
+    {% endif %}
+
+    {% include 'components/footer.html' %}
+
+    <script>
+    (function() {
+        var theme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', theme);
+        document.body.classList.add(theme === 'light' ? 'theme-light' : 'theme-dark');
+        var btn = document.getElementById('theme-toggle');
+        var iconDark = document.querySelector('.theme-icon-dark');
+        var iconLight = document.querySelector('.theme-icon-light');
+        
+        if (btn && iconDark && iconLight) {
+            // Mostrar icono correcto según tema inicial
+            if (theme === 'light') {
+                iconDark.style.display = 'none';
+                iconLight.style.display = 'inline';
+            } else {
+                iconDark.style.display = 'inline';
+                iconLight.style.display = 'none';
+            }
+            
+            btn.addEventListener('click', function() {
+                theme = document.body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                document.body.setAttribute('data-theme', theme);
+                document.body.classList.remove('theme-light', 'theme-dark');
+                document.body.classList.add(theme === 'light' ? 'theme-light' : 'theme-dark');
+                
+                // Cambiar iconos
+                if (theme === 'light') {
+                    iconDark.style.display = 'none';
+                    iconLight.style.display = 'inline';
+                } else {
+                    iconDark.style.display = 'inline';
+                    iconLight.style.display = 'none';
+                }
+                
+                localStorage.setItem('theme', theme);
+            });
+        }
+        var navToggle = document.getElementById('nav-toggle');
+        var nav = document.querySelector('.site-header nav');
+        if (navToggle && nav) {
+            navToggle.addEventListener('click', function() {
+                nav.classList.toggle('open');
+                navToggle.setAttribute('aria-expanded', nav.classList.contains('open'));
+            });
+        }
+        var msgEl = document.querySelector('.messages li.success');
+        if (msgEl && msgEl.textContent.indexOf('agendada') !== -1) {
+            alert('¡Cita agendada correctamente! Te contactaremos para confirmar disponibilidad.');
+        }
+        
+        // Función global para cambiar imágenes según el tema
+        function updateThemeImages() {
+            var currentTheme = document.body.getAttribute('data-theme');
+            var themeImages = document.querySelectorAll('[data-theme-dark][data-theme-light]');
+            
+            themeImages.forEach(function(img) {
+                var darkSrc = img.getAttribute('data-theme-dark');
+                var lightSrc = img.getAttribute('data-theme-light');
+                
+                if (currentTheme === 'light' && lightSrc) {
+                    img.src = lightSrc;
+                } else if (currentTheme === 'dark' && darkSrc) {
+                    img.src = darkSrc;
+                }
+            });
+        }
+        
+        // Actualizar imágenes al cargar la página
+        updateThemeImages();
+        
+        // Escuchar cambios en el tema
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                    updateThemeImages();
+                }
+            });
+        });
+        
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['data-theme']
+        });
+    })();
+    
+    // Mobile Navigation
+    document.addEventListener('DOMContentLoaded', function() {
+        const navToggle = document.getElementById('nav-toggle');
+        const navOverlay = document.getElementById('nav-overlay');
+        const nav = document.querySelector('.site-header nav');
+        
+        if (navToggle && navOverlay && nav) {
+            navToggle.addEventListener('click', function() {
+                nav.classList.toggle('open');
+                navOverlay.classList.toggle('show');
+                document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
+            });
+            
+            navOverlay.addEventListener('click', function() {
+                nav.classList.remove('open');
+                navOverlay.classList.remove('show');
+                document.body.style.overflow = '';
+            });
+        }
+    });
+    
+    // Floating Notification System
+    function showNotification(message, type) {
+        var container = document.getElementById('notification-container');
+        if (!container) return;
+        
+        var notification = document.createElement('div');
+        notification.className = 'notification notification-' + (type || 'info');
+        notification.innerHTML = '<span class="notification-message">' + message + '</span><button class="notification-close" onclick="this.parentElement.remove()">×</button>';
+        
+        container.appendChild(notification);
+        
+        // Auto-dismiss after 5 seconds
+        setTimeout(function() {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
+        
+        // Animate in
+        setTimeout(function() {
+            notification.classList.add('notification-show');
+        }, 10);
+    }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

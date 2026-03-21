@@ -1,0 +1,167 @@
+/* =========================
+   FLOATING NOTIFICATIONS
+========================= */
+
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    max-width: 400px;
+    width: 100%;
+}
+
+.notification {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-primary);
+}
+
+.notification-show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-message {
+    flex: 1;
+    font-weight: 500;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.notification-close:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+/* Notification Types */
+.notification-success {
+    background: var(--success-bg);
+    border-color: var(--success-border);
+    color: var(--success-text);
+}
+
+.notification-error {
+    background: var(--error-bg);
+    border-color: var(--error-border);
+    color: var(--error-text);
+}
+
+.notification-warning {
+    background: var(--warning-bg);
+    border-color: var(--warning-border);
+    color: var(--warning-text);
+}
+
+.notification-info {
+    background: var(--info-bg);
+    border-color: var(--info-border);
+    color: var(--info-text);
+}
+
+/* Icons for different types */
+.notification-success::before {
+    content: "✓";
+    display: inline-block;
+    margin-right: 8px;
+    font-weight: bold;
+    color: var(--success-text);
+}
+
+.notification-error::before {
+    content: "✕";
+    display: inline-block;
+    margin-right: 8px;
+    font-weight: bold;
+    color: var(--error-text);
+}
+
+.notification-warning::before {
+    content: "⚠";
+    display: inline-block;
+    margin-right: 8px;
+    font-weight: bold;
+    color: var(--warning-text);
+}
+
+.notification-info::before {
+    content: "ℹ";
+    display: inline-block;
+    margin-right: 8px;
+    font-weight: bold;
+    color: var(--info-text);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .notification-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .notification {
+        padding: 14px 16px;
+        font-size: 13px;
+    }
+    
+    .notification-close {
+        width: 20px;
+        height: 20px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .notification-container {
+        top: 70px; /* Avoid navbar on mobile */
+    }
+    
+    .notification {
+        padding: 12px 14px;
+        font-size: 12px;
+    }
+}
+
+/* Animation for multiple notifications */
+.notification:nth-child(1) { z-index: 10000; }
+.notification:nth-child(2) { z-index: 9999; }
+.notification:nth-child(3) { z-index: 9998; }
+.notification:nth-child(4) { z-index: 9997; }
+.notification:nth-child(5) { z-index: 9996; }
+
+/* Remove old message styles */
+.messages {
+    display: none !important;
+}

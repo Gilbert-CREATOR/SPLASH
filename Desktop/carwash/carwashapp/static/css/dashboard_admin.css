@@ -1,0 +1,110 @@
+/* ===========================
+   Dashboard Administrador
+=========================== */
+/* ===== Estilos generales ===== */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    padding: 20px;
+}
+
+/* ===== Botones ===== */
+.btn-primary,
+.btn-danger,
+.btn-agregar {
+    display: inline-block;
+    background: transparent;
+    color: var(--text-primary);
+    padding: 8px 15px;
+    margin: 10px 0;
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover,
+.btn-danger:hover,
+.btn-agregar:hover {
+    background: var(--accent);
+    color: var(--accent-hover);
+}
+
+/* ===== Tabla ===== */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.table th, .table td {
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 10px;
+    text-align: left;
+}
+
+.table th {
+    background-color: rgba(10,10,10,0.75);
+    color: #ffffff;
+}
+
+.table tr:nth-child(even) {
+    background-color: rgba(0,0,0,0.6);
+}
+
+/* =========================
+   DASHBOARD ADMIN - RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+    body {
+        padding: 12px;
+    }
+    .table {
+        font-size: 14px;
+    }
+    .table th,
+    .table td {
+        padding: 8px 6px;
+    }
+}
+
+@media (max-width: 600px) {
+    .table,
+    .table thead,
+    .table tbody,
+    .table th,
+    .table td,
+    .table tr {
+        display: block;
+    }
+    .table thead tr {
+        display: none;
+    }
+    .table tr {
+        margin-bottom: 12px;
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 12px;
+        overflow: hidden;
+        background: rgba(0,0,0,0.4);
+    }
+    .table td {
+        padding: 8px 12px 8px 45%;
+        position: relative;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .table td:last-child {
+        border-bottom: none;
+    }
+    .table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 12px;
+        font-weight: 600;
+        font-size: 12px;
+        color: #cfcfcf;
+    }
+}

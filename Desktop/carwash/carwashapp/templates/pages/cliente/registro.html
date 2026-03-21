@@ -1,0 +1,29 @@
+{% extends "layouts/app.html" %}
+
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login_registro.css' %}">
+{% endblock %}
+
+{% block title %}Registro · B&B Car Wash{% endblock %}
+
+{% block content %}
+<div class="auth-right">
+    <div class="auth-card">
+        <h2>Datos de tu cuenta</h2>
+        {% if messages %}
+        <div class="form-message">
+            {% for message in messages %}
+            <p class="form-message form-message--{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Registrarse</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

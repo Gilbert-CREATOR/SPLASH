@@ -1,0 +1,441 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block title %}Detalle de Cita{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+    <div class="container">
+        <div class="page-header">
+            <h1>📅 Detalle de Cita</h1>
+            <div class="header-actions">
+                <a href="{% url 'dashboard_citas' %}" class="btn-secondary">
+                    ← Volver a Citas
+                </a>
+            </div>
+        </div>
+
+        <div class="cita-detail-card">
+            <div class="cita-header">
+                <div class="cita-info-main">
+                    <h2>{{ cita.nombre }}</h2>
+                    <p class="cita-contacto">
+                        📞 {{ cita.telefono }}{% if cita.email %} | 📧 {{ cita.email }}{% endif %}
+                    </p>
+                </div>
+                <div class="cita-estado">
+                    <span class="estado-badge estado-{{ cita.estado }}">
+                        {% if cita.estado == 'pendiente' %}⏳ Pendiente{% endif %}
+                        {% if cita.estado == 'confirmada' %}✅ Confirmada{% endif %}
+                        {% if cita.estado == 'en_proceso' %}🔧 En Proceso{% endif %}
+                        {% if cita.estado == 'cancelada' %}❌ Cancelada{% endif %}
+                        {% if cita.estado == 'finalizada' %}✨ Finalizada{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="cita-details-grid">
+                <div class="detail-item">
+                    <label>🚗 Vehículo</label>
+                    <p>
+                        {% if cita.marca and cita.modelo %}
+                            {{ cita.marca.nombre }} {{ cita.modelo.nombre }}
+                        {% else %}
+                            No especificado
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="detail-item">
+                    <label>🔧 Servicio</label>
+                    <p>{{ cita.servicio.nombre }}</p>
+                </div>
+
+                <div class="detail-item">
+                    <label>📅 Fecha</label>
+                    <p>{{ cita.fecha|date:"d/m/Y" }}</p>
+                </div>
+
+                <div class="detail-item">
+                    <label>⏰ Hora</label>
+                    <p>{{ cita.hora|time:"H:i" }}</p>
+                </div>
+
+                <div class="detail-item">
+                    <label>💰 Precio</label>
+                    <p>${{ cita.servicio.precio }}</p>
+                </div>
+
+                <div class="detail-item">
+                    <label>📋 Estado</label>
+                    <p class="estado-texto estado-{{ cita.estado }}">
+                        {{ cita.get_estado_display }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- ACCIONES DISPONIBLES SEGÚN ESTADO -->
+            <div class="cita-actions">
+                {% if cita.estado == 'en_proceso' %}
+                    <!-- BOTONES PARA CITAS EN PROCESO -->
+                    <div class="action-group">
+                        <h3>🍽️ Cafetería</h3>
+                        <p>Agregar productos de cafetería a esta cita</p>
+                        <a href="{% url 'cafeteria_orden_create_cita' cita.id %}" class="btn-primary">
+                            ☕ Agregar Productos
+                        </a>
+                    </div>
+
+                    <!-- ESTADO DE CAFETERÍA -->
+                    {% if cita.ordenes_cafeteria.all %}
+                        <div class="action-group cafeteria-activa">
+                            <h3>🟢 Servicio Activo</h3>
+                            <p>
+                                <strong>Cafetería en curso:</strong> 
+                                {{ cita.ordenes_cafeteria.count }} orden{{ cita.ordenes_cafeteria.count|pluralize:"es" }} activa{{ cita.ordenes_cafeteria.count|pluralize:"s" }}
+                            </p>
+                            <p class="info-importante">
+                                El servicio del carwash permanecerá en proceso hasta que finalices la cita manualmente.
+                            </p>
+                        </div>
+                    {% endif %}
+
+                    <div class="action-group">
+                        <h3>🔄 Finalizar Servicio</h3>
+                        <p>
+                            {% if cita.ordenes_cafeteria.all %}
+                                <strong>Importante:</strong> Hay órdenes de cafetería activas. 
+                                Al finalizar, se podrán crear facturas con todos los servicios.
+                            {% else %}
+                                Finalizar esta cita para poder crear facturas.
+                            {% endif %}
+                        </p>
+                        <div class="btn-group">
+                            <a href="{% url 'cambiar_estado_cita' cita.id 'finalizada' %}" 
+                               class="btn-success btn-finalizar"
+                               onclick="return confirmarFinalizacion()">
+                                ✨ Finalizar Cita
+                            </a>
+                            <a href="{% url 'cambiar_estado_cita' cita.id 'cancelada' %}" 
+                               class="btn-danger"
+                               onclick="return confirm('¿Estás seguro de cancelar esta cita?')">
+                                ❌ Cancelar Cita
+                            </a>
+                        </div>
+                        
+                        {% if cita.ordenes_cafeteria.all %}
+                        <script>
+                        function confirmarFinalizacion() {
+                            return confirm('¿Estás seguro de finalizar esta cita? Hay {{ cita.ordenes_cafeteria.count }} orden{{ cita.ordenes_cafeteria.count|pluralize:es }} de cafetería activa{{ cita.ordenes_cafeteria.count|pluralize:s }}.');
+                        }
+                        </script>
+                        {% else %}
+                        <script>
+                        function confirmarFinalizacion() {
+                            return confirm('¿Estás seguro de finalizar esta cita?');
+                        }
+                        </script>
+                        {% endif %}
+                    </div>
+
+                {% elif cita.estado == 'finalizada' %}
+                    <!-- BOTONES PARA CITAS FINALIZADAS -->
+                    <div class="action-group">
+                        <h3>🧾 Facturación</h3>
+                        <p>Crear factura para esta cita finalizada</p>
+                        {% if not cita.factura %}
+                            <a href="{% url 'factura_crear' cita.id %}" class="btn-success">
+                                📄 Crear Factura
+                            </a>
+                        {% else %}
+                            <a href="{% url 'factura_detalle' cita.factura.id %}" class="btn-info">
+                                📋 Ver Factura Existente
+                            </a>
+                        {% endif %}
+                    </div>
+
+                {% elif cita.estado == 'pendiente' or cita.estado == 'confirmada' %}
+                    <!-- BOTONES PARA CITAS PENDIENTES/CONFIRMADAS -->
+                    <div class="action-group">
+                        <h3>🔄 Cambiar Estado</h3>
+                        <p>Gestionar el estado de esta cita</p>
+                        <div class="btn-group">
+                            {% if cita.estado == 'pendiente' %}
+                                <a href="{% url 'cambiar_estado_cita' cita.id 'confirmada' %}" class="btn-primary">
+                                    ✅ Confirmar Cita
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'cambiar_estado_cita' cita.id 'en_proceso' %}" class="btn-warning">
+                                🔧 Iniciar Proceso
+                            </a>
+                            <a href="{% url 'cambiar_estado_cita' cita.id 'cancelada' %}" class="btn-danger"
+                               onclick="return confirm('¿Estás seguro de cancelar esta cita?')">
+                                ❌ Cancelar Cita
+                            </a>
+                        </div>
+                    </div>
+
+                {% else %}
+                    <!-- CITAS CANCELADAS -->
+                    <div class="action-group disabled">
+                        <h3>🚫 Acciones No Disponibles</h3>
+                        <p>Esta cita está cancelada y no puede ser modificada.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- ÓRDENES DE CAFETERÍA EXISTENTES -->
+            {% if cita.ordenes_cafeteria.all %}
+                <div class="cafeteria-ordenes">
+                    <h3>🍽️ Órdenes de Cafetería</h3>
+                    {% for orden in cita.ordenes_cafeteria.all %}
+                        <div class="orden-card">
+                            <div class="orden-header">
+                                <span class="orden-id">#{{ orden.id }}</span>
+                                <span class="orden-fecha">{{ orden.fecha_hora|date:"d/m/Y H:i" }}</span>
+                                <span class="orden-estado estado-{{ orden.estado }}">
+                                    {{ orden.get_estado_display }}
+                                </span>
+                            </div>
+                            <div class="orden-items">
+                                {% for detalle in orden.detalles.all %}
+                                    <div class="item">
+                                        <span class="item-nombre">{{ detalle.producto.nombre }}</span>
+                                        <span class="item-cantidad">×{{ detalle.cantidad }}</span>
+                                        <span class="item-precio">${{ detalle.precio_unitario }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="orden-total">
+                                <strong>Total: ${{ orden.total }}</strong>
+                            </div>
+                            <div class="orden-actions">
+                                <a href="{% url 'cafeteria_orden_detalle' orden.id %}" class="btn-info">
+                                    👁️ Ver Detalle
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.cita-detail-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 30px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 30px;
+}
+
+.cita-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.cita-info-main h2 {
+    margin: 0 0 10px 0;
+    color: var(--text-primary);
+    font-size: 28px;
+}
+
+.cita-contacto {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.cita-estado {
+    text-align: right;
+}
+
+.estado-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.estado-pendiente { background: var(--warning-bg); color: var(--warning-text); }
+.estado-confirmada { background: var(--info-bg); color: var(--info-text); }
+.estado-en_proceso { background: var(--accent); color: var(--accent-hover); }
+.estado-finalizada { background: var(--success-bg); color: var(--success-text); }
+.estado-cancelada { background: var(--error-bg); color: var(--error-text); }
+
+.cita-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.detail-item {
+    background: var(--bg-input);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+}
+
+.detail-item label {
+    display: block;
+    font-weight: bold;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.detail-item p {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 16px;
+}
+
+.cita-actions {
+    margin-top: 30px;
+}
+
+.action-group {
+    background: var(--bg-input);
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-light);
+}
+
+.action-group h3 {
+    margin: 0 0 10px 0;
+    color: var(--text-primary);
+}
+
+.action-group p {
+    margin: 0 0 20px 0;
+    color: var(--text-secondary);
+}
+
+.action-group.disabled {
+    opacity: 0.6;
+}
+
+.cafeteria-activa {
+    background: var(--success-bg) !important;
+    border-color: var(--success-border) !important;
+}
+
+.cafeteria-activa h3 {
+    color: var(--success-text) !important;
+}
+
+.info-importante {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 6px;
+    border-left: 4px solid var(--success-text);
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
+.btn-finalizar {
+    background: var(--success-bg) !important;
+    color: var(--success-text) !important;
+    border-color: var(--success-border) !important;
+    font-weight: bold;
+}
+
+.btn-finalizar:hover {
+    background: var(--success-border) !important;
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cafeteria-ordenes {
+    margin-top: 30px;
+}
+
+.cafeteria-ordenes h3 {
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.orden-card {
+    background: var(--bg-input);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.orden-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.orden-id {
+    font-weight: bold;
+    color: var(--accent);
+}
+
+.orden-fecha {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.orden-items {
+    margin-bottom: 15px;
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.item-nombre {
+    flex: 1;
+    color: var(--text-primary);
+}
+
+.item-cantidad {
+    color: var(--text-secondary);
+    margin: 0 15px;
+}
+
+.item-precio {
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.orden-total {
+    text-align: right;
+    margin-bottom: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-light);
+}
+
+.orden-actions {
+    text-align: right;
+}
+</style>
+{% endblock %}

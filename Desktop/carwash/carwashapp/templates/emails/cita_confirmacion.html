@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Cita - B&B Car Wash</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .cita-info {
+            background: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .cita-info h3 {
+            margin: 0 0 15px 0;
+            color: #4CAF50;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 5px 0;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #666;
+        }
+        .info-value {
+            color: #333;
+        }
+        .footer {
+            background: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background: #45a049;
+        }
+        .social-links {
+            margin: 20px 0;
+        }
+        .social-links a {
+            margin: 0 10px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 B&B Car Wash</h1>
+            <p>Confirmación de Cita</p>
+        </div>
+        
+        <div class="content">
+            <h2>¡Hola {{ nombre_cliente }}!</h2>
+            <p>Tu cita ha sido <strong>confirmada exitosamente</strong>. Estamos listos para darte el mejor servicio.</p>
+            
+            <div class="cita-info">
+                <h3>📅 Detalles de tu Cita</h3>
+                <div class="info-row">
+                    <span class="info-label">Servicio:</span>
+                    <span class="info-value">{{ servicio.nombre }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Fecha:</span>
+                    <span class="info-value">{{ fecha_formateada }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Hora:</span>
+                    <span class="info-value">{{ hora_formateada }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Precio:</span>
+                    <span class="info-value">${{ servicio.precio }}</span>
+                </div>
+            </div>
+            
+            <h3>📍 ¿Qué necesitas llevar?</h3>
+            <ul>
+                <li>Tu vehículo (por supuesto 😉)</li>
+                <li>Documentos del vehículo si los necesitas</li>
+                <li>Ganas de disfrutar de nuestro servicio premium</li>
+            </ul>
+            
+            <h3>⏰ Recomendaciones:</h3>
+            <ul>
+                <li>Llega 10 minutos antes de tu hora programada</li>
+                <li>Retira objetos de valor del vehículo</li>
+                <li>Si necesitas cancelar, avísanos con 24 horas de anticipación</li>
+            </ul>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="#" class="btn">📞 Contactar</a>
+                <a href="#" class="btn">📍 Ver Ubicación</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>¡Te esperamos!</strong></p>
+            <p>📞 Teléfono: (809) 123-4567</p>
+            <p>📍 Dirección: Calle Principal #123, Santo Domingo</p>
+            <p>🌐 www.bbcarwash.com</p>
+            
+            <div class="social-links">
+                <a href="#">📘 Facebook</a>
+                <a href="#">📷 Instagram</a>
+                <a href="#">🐦 Twitter</a>
+            </div>
+            
+            <p style="font-size: 12px; margin-top: 20px;">
+                Este es un mensaje automático. Por favor no respondas a este email.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

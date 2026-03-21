@@ -1,0 +1,355 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block title %}Mis Facturas · B&B Car Wash{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/factura.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="facturas-list-page">
+    <div class="container">
+        <div class="facturas-header">
+            <h1>🧾 Mis Facturas</h1>
+            <p>Historial de todas tus facturas</p>
+        </div>
+
+        {% if facturas %}
+            <div class="facturas-grid">
+                {% for factura in facturas %}
+                    <div class="factura-card">
+                        <div class="factura-card-header">
+                            <div class="factura-numero">
+                                <h3>{{ factura.numero_factura }}</h3>
+                                <span class="factura-fecha">{{ factura.fecha_emision|date:"d/m/Y" }}</span>
+                            </div>
+                            
+                            <div class="factura-estado">
+                                <span class="estado-{{ factura.estado }}">
+                                    {{ factura.get_estado_display }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="factura-card-body">
+                            <div class="factura-cliente">
+                                <h4>👤 Cliente</h4>
+                                <p>{{ factura.cliente_nombre }}</p>
+                                {% if factura.cliente_telefono %}
+                                    <p>📞 {{ factura.cliente_telefono }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="factura-servicios">
+                                <h4>🚗 Servicio</h4>
+                                <p>{{ factura.cita.servicio.nombre }}</p>
+                                <p>{{ factura.cita.fecha }} {{ cita.hora }}</p>
+                                {% if factura.cita.marca and factura.cita.modelo %}
+                                    <p>{{ factura.cita.marca.nombre }} {{ factura.cita.modelo.nombre }}</p>
+                                {% endif %}
+                            </div>
+
+                            {% if factura.tiene_cafeteria %}
+                                <div class="factura-cafeteria">
+                                    <h4>☕ Cafetería</h4>
+                                    <p>{{ factura.orden_cafeteria.cantidad_items }} productos</p>
+                                    <p>${{ factura.subtotal_cafeteria }}</p>
+                                </div>
+                            {% endif %}
+
+                            <div class="factura-metodo">
+                                <h4>💳 Método de Pago</h4>
+                                <span class="metodo-pago metodo-{{ factura.metodo_pago }}">
+                                    {{ factura.get_metodo_pago_display }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="factura-card-footer">
+                            <div class="factura-total">
+                                <span>Total:</span>
+                                <span>${{ factura.total_factura }}</span>
+                            </div>
+                            
+                            <div class="factura-acciones">
+                                <a href="{% url 'factura_detalle' factura.id %}" class="btn-primary">
+                                    📋 Ver Detalles
+                                </a>
+                                
+                                {% if factura.estado == 'pagada' %}
+                                    <button onclick="window.print()" class="btn-secondary">
+                                        🖨️ Imprimir
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-facturas">
+                <h2>📭 No tienes facturas</h2>
+                <p>Aún no has generado ninguna factura. Las facturas se crean cuando utilizas los servicios del car wash y/o la cafetería.</p>
+                <div class="no-facturas-actions">
+                    <a href="{% url 'agendar_cita' %}" class="btn-primary">
+                        🚗 Agendar Cita
+                    </a>
+                    <a href="{% url 'cafeteria_menu' %}" class="btn-secondary">
+                        ☕ Ver Menú de Cafetería
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.facturas-list-page {
+    padding: 40px 0;
+    min-height: 100vh;
+    background: var(--bg-page);
+}
+
+.facturas-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.facturas-header h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.facturas-header p {
+    color: var(--text-secondary);
+    font-size: 18px;
+}
+
+.facturas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+.factura-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.factura-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.factura-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.factura-numero h3 {
+    margin: 0 0 5px 0;
+    color: var(--text-primary);
+    font-size: 18px;
+}
+
+.factura-fecha {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.factura-estado {
+    flex-shrink: 0;
+}
+
+.estado-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.estado-pendiente { background: var(--warning-bg); color: var(--text-primary); }
+.estado-emitida { background: var(--info-bg); color: var(--text-primary); }
+.estado-pagada { background: var(--success-bg); color: var(--text-primary); }
+.estado-cancelada { background: var(--error-bg); color: var(--text-primary); }
+
+.factura-card-body {
+    padding: 20px;
+}
+
+.factura-cliente,
+.factura-servicios,
+.factura-cafeteria,
+.factura-metodo {
+    margin-bottom: 20px;
+}
+
+.factura-cliente h4,
+.factura-servicios h4,
+.factura-cafeteria h4,
+.factura-metodo h4 {
+    margin: 0 0 10px 0;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.factura-cliente p,
+.factura-servicios p,
+.factura-cafeteria p {
+    margin: 0 0 5px 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.factura-cafeteria {
+    padding-top: 15px;
+    border-top: 1px solid var(--border-light);
+}
+
+.metodo-pago {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.metodo-efectivo { background: var(--success-bg); color: var(--text-primary); }
+.metodo-tarjeta { background: var(--info-bg); color: var(--text-primary); }
+.metodo-transferencia { background: var(--warning-bg); color: var(--text-primary); }
+.metodo-mixto { background: var(--accent); color: var(--accent-hover); }
+
+.factura-card-footer {
+    padding: 20px;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.factura-total {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.factura-total span:first-child {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.factura-total span:last-child {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.factura-acciones {
+    display: flex;
+    gap: 10px;
+}
+
+.factura-acciones .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: var(--accent-hover);
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+    color: var(--accent);
+}
+
+.btn-secondary {
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--border-color);
+}
+
+.no-facturas {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.no-facturas h2 {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.no-facturas p {
+    font-size: 16px;
+    margin-bottom: 30px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.no-facturas-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .facturas-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .factura-card-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .factura-card-footer {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .factura-total {
+        align-items: center;
+    }
+    
+    .factura-acciones {
+        justify-content: center;
+    }
+    
+    .no-facturas-actions {
+        flex-direction: column;
+    }
+    
+    .no-facturas-actions .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

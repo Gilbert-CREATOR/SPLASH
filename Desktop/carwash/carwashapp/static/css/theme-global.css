@@ -1,0 +1,185 @@
+/* =========================
+   TEMA GLOBAL - CLARO / OSCURO
+   Variables unificadas para toda la aplicación
+========================= */
+:root {
+    /* Colores principales */
+    --bg-page: #0b0f14;
+    --bg-card: rgba(10, 10, 10, 0.85);
+    --bg-nav: #0b0f14;
+    --bg-input: rgba(0, 0, 0, 0.6);
+    
+    /* Texto */
+    --text-primary: #ffffff;
+    --text-secondary: #d1d1d1;
+    --text-muted: #9e9e9e;
+    
+    /* Bordes y sombras */
+    --border-color: rgba(255, 255, 255, 0.2);
+    --border-light: rgba(255, 255, 255, 0.1);
+    --border-nav: rgba(255, 255, 255, 0.1);
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    
+    /* Footer */
+    --footer-bg: #060809;
+    --footer-text: rgba(255, 255, 255, 0.7);
+    
+    /* Acentos y botones */
+    --accent: #ffffff;
+    --accent-hover: #000000;
+    --link-hover-bg: #ffffff;
+    --link-hover-text: #000000;
+    
+    /* Estados */
+    --success-bg: rgba(76, 175, 80, 0.2);
+    --success-border: rgba(76, 175, 80, 0.5);
+    --success-text: #81c784;
+    --error-bg: rgba(244, 67, 54, 0.2);
+    --error-border: rgba(244, 67, 54, 0.5);
+    --error-text: #f44336;
+    --warning-bg: rgba(255, 152, 0, 0.2);
+    --warning-border: rgba(255, 152, 0, 0.5);
+    --warning-text: #ffb74d;
+    --info-bg: rgba(100, 181, 246, 0.2);
+    --info-border: rgba(100, 181, 246, 0.5);
+    --info-text: #90caf9;
+}
+
+[data-theme="light"] {
+    /* Colores principales */
+    --bg-page: #f0f2f5;
+    --bg-card: #ffffff;
+    --bg-nav: #ffffff;
+    --bg-input: #ffffff;
+    
+    /* Texto */
+    --text-primary: #1a1a1a;
+    --text-secondary: #4a4a4a;
+    --text-muted: #6c757d;
+    
+    /* Bordes y sombras */
+    --border-color: rgba(0, 0, 0, 0.12);
+    --border-light: rgba(0, 0, 0, 0.08);
+    --border-nav: rgba(0, 0, 0, 0.1);
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    
+    /* Footer */
+    --footer-bg: #1a1a1a;
+    --footer-text: rgba(255, 255, 255, 0.85);
+    
+    /* Acentos y botones */
+    --accent: #1a1a1a;
+    --accent-hover: #ffffff;
+    --link-hover-bg: #1a1a1a;
+    --link-hover-text: #ffffff;
+    
+    /* Estados (mismos colores para consistencia) */
+    --success-bg: rgba(76, 175, 80, 0.1);
+    --success-border: rgba(76, 175, 80, 0.4);
+    --success-text: #2e7d32;
+    --error-bg: rgba(244, 67, 54, 0.1);
+    --error-border: rgba(244, 67, 54, 0.4);
+    --error-text: #c62828;
+    --warning-bg: rgba(255, 152, 0, 0.1);
+    --warning-border: rgba(255, 152, 0, 0.4);
+    --warning-text: #f57c00;
+    --info-bg: rgba(100, 181, 246, 0.1);
+    --info-border: rgba(100, 181, 246, 0.4);
+    --info-text: #1976d2;
+}
+
+body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+main {
+    min-height: calc(100vh - 140px);
+    transition: background-color 0.35s ease;
+}
+
+/* Contenedores y cards que usen estas variables heredan el tema */
+.theme-aware,
+.pagina-inicio .intro,
+.pagina-inicio .servicios-section,
+.pagina-inicio .hero-footer,
+.pagina-inicio .servicio-card,
+.agendar-page .container,
+.agendar-page .servicio-card {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.pagina-inicio .intro p,
+.pagina-inicio .hero-footer__card p,
+.pagina-inicio .desc,
+.pagina-inicio .precio-line {
+    color: var(--text-secondary);
+}
+
+.agendar-page p,
+.agendar-page .desc,
+.agendar-page label {
+    color: var(--text-secondary);
+}
+
+.agendar-page input,
+.agendar-page select {
+    background: var(--bg-input);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-primary,
+.btn-secondary {
+    transition: all 0.3s ease;
+}
+
+[data-theme="light"] .btn-primary {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+[data-theme="light"] .btn-primary:hover {
+    background: var(--accent);
+    color: var(--accent-hover);
+}
+
+[data-theme="light"] .btn-secondary {
+    background: rgba(0, 0, 0, 0.06);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .btn-secondary:hover {
+    background: var(--accent);
+    color: var(--accent-hover);
+}
+
+/* Footer del sitio */
+.site-footer {
+    background: var(--footer-bg);
+    color: var(--footer-text);
+    padding: 24px 20px;
+    text-align: center;
+    margin-top: auto;
+    border-top: 1px solid var(--border-light);
+    transition: background 0.35s ease, color 0.35s ease;
+}
+
+.site-footer p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.site-footer .brand {
+    font-weight: 700;
+    font-size: 1.1em;
+    color: var(--footer-text);
+}
+
+.site-footer .year {
+    opacity: 0.9;
+}

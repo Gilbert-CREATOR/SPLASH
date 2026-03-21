@@ -1,0 +1,206 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="container">
+        <div class="admin-header">
+            <h1>🗑️ Eliminar Producto</h1>
+            <a href="{% url 'admin_productos' %}" class="btn-secondary">← Volver</a>
+        </div>
+
+        <div class="confirmar-eliminar">
+            <div class="alerta alerta-peligro">
+                <h2>⚠️ ¿Estás seguro de eliminar este producto?</h2>
+                <p>Esta acción no se puede deshacer y eliminará permanentemente el producto.</p>
+            </div>
+
+            <div class="detalle-item">
+                <div class="producto-header">
+                    {% if producto.imagen %}
+                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="producto-thumb">
+                    {% else %}
+                        <div class="producto-thumb-placeholder">
+                            🍽️
+                        </div>
+                    {% endif %}
+                    
+                    <div class="producto-info">
+                        <h3>{{ producto.nombre }}</h3>
+                        <p class="producto-categoria">{{ producto.categoria.nombre }}</p>
+                        {% if producto.popular %}
+                            <span class="badge-popular">⭐ Popular</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if producto.descripcion %}
+                    <p class="producto-descripcion">{{ producto.descripcion }}</p>
+                {% endif %}
+                
+                <div class="meta-info">
+                    <span>💰 ${{ producto.precio }}</span>
+                    <span>⏱️ {{ producto.preparacion_tiempo }} min</span>
+                    <span>📦 {{ producto.stock }} unidades</span>
+                    <span class="estado-{{ producto.activo|yesno:'activo,inactivo' }}">
+                        {{ producto.activo|yesno:"Activo,Inactivo" }}
+                    </span>
+                </div>
+                
+                {% if producto.ingredientes %}
+                    <div class="ingredientes-info">
+                        <h4>Ingredientes:</h4>
+                        <p>{{ producto.ingredientes }}</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <form method="post" class="form-confirmar">
+                {% csrf_token %}
+                <div class="form-actions">
+                    <a href="{% url 'admin_productos' %}" class="btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn-danger">🗑️ Eliminar Producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.confirmar-eliminar {
+    max-width: 700px;
+    margin: 40px auto;
+}
+
+.alerta {
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.alerta-peligro {
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    color: var(--text-primary);
+}
+
+.detalle-item {
+    background: var(--bg-secondary);
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border: 1px solid var(--border-color);
+}
+
+.producto-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.producto-thumb {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.producto-thumb-placeholder {
+    width: 80px;
+    height: 80px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+}
+
+.producto-info h3 {
+    margin: 0 0 5px 0;
+    color: var(--text-primary);
+}
+
+.producto-categoria {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.badge-popular {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--accent-hover);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.producto-descripcion {
+    margin: 15px 0;
+    color: var(--text-secondary);
+}
+
+.meta-info {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.meta-info span {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.ingredientes-info {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.ingredientes-info h4 {
+    margin: 0 0 10px 0;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.ingredientes-info p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.form-confirmar {
+    text-align: center;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .producto-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .meta-info {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+</style>
+{% endblock %}

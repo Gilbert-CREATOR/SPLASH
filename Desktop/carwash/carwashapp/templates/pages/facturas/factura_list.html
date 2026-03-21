@@ -1,0 +1,688 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block title %}Facturas y Citas Pendientes · B&B Car Wash{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/factura.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="facturas-list-page">
+    <div class="container">
+        <div class="facturas-header">
+            <h1>🧾 Facturas y Citas Pendientes</h1>
+            <p>Gestiona facturas existentes y citas pendientes de facturar</p>
+        </div>
+
+        <!-- CITAS PENDIENTES DE FACTURAR -->
+        {% if citas_pendientes %}
+            <div class="citas-pendientes-section">
+                <div class="section-header">
+                    <h2>⏰ Citas Pendientes de Facturar</h2>
+                    <div class="badge-counter">
+                        <span class="counter">{{ total_pendientes }}</span>
+                        <span>pendientes</span>
+                    </div>
+                </div>
+
+                <!-- Citas en Proceso -->
+                {% if citas_en_proceso %}
+                    <div class="estado-grupo">
+                        <h3>🔧 Citas en Proceso</h3>
+                        <div class="citas-grid">
+                            {% for cita in citas_en_proceso %}
+                                <div class="cita-card cita-en-proceso">
+                                    <div class="cita-header">
+                                        <div class="cita-info">
+                                            <h4>{{ cita.nombre }}</h4>
+                                            <p>📞 {{ cita.telefono }}</p>
+                                        </div>
+                                        <div class="cita-estado">
+                                            <span class="estado-badge estado-en-proceso">
+                                                🔧 En Proceso
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="cita-detalles">
+                                        <div class="detalle-item">
+                                            <span class="label">🚗 Servicio:</span>
+                                            <span class="value">{{ cita.servicio.nombre }}</span>
+                                        </div>
+                                        <div class="detalle-item">
+                                            <span class="label">📅 Fecha:</span>
+                                            <span class="value">{{ cita.fecha|date:"d/m/Y" }} {{ cita.hora|time:"H:i" }}</span>
+                                        </div>
+                                        {% if cita.marca and cita.modelo %}
+                                            <div class="detalle-item">
+                                                <span class="label">🚙 Vehículo:</span>
+                                                <span class="value">{{ cita.marca.nombre }} {{ cita.modelo.nombre }}</span>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        <!-- Órdenes de Cafetería -->
+                                        {% if cita.ordenes_cafeteria.all %}
+                                            <div class="cafeteria-info">
+                                                <span class="label">☕ Cafetería:</span>
+                                                <span class="value">
+                                                    {{ cita.ordenes_cafeteria.count }} orden{{ cita.ordenes_cafeteria.count|pluralize:"es" }}
+                                                    (${{ cita.total_cafeteria }})
+                                                </span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="cita-acciones">
+                                        <a href="{% url 'dashboard_cita_detalle' cita.id %}" class="btn-info">
+                                            👁️ Ver Detalle
+                                        </a>
+                                        <a href="{% url 'cafeteria_orden_create_cita' cita.id %}" class="btn-primary">
+                                            ☕ Agregar Productos
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Citas Finalizadas -->
+                {% if citas_finalizadas %}
+                    <div class="estado-grupo">
+                        <h3>✨ Citas Finalizadas (Sin Factura)</h3>
+                        <div class="citas-grid">
+                            {% for cita in citas_finalizadas %}
+                                <div class="cita-card cita-finalizada">
+                                    <div class="cita-header">
+                                        <div class="cita-info">
+                                            <h4>{{ cita.nombre }}</h4>
+                                            <p>📞 {{ cita.telefono }}</p>
+                                        </div>
+                                        <div class="cita-estado">
+                                            <span class="estado-badge estado-finalizada">
+                                                ✨ Finalizada
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="cita-detalles">
+                                        <div class="detalle-item">
+                                            <span class="label">🚗 Servicio:</span>
+                                            <span class="value">{{ cita.servicio.nombre }} (${{ cita.servicio.precio }})</span>
+                                        </div>
+                                        <div class="detalle-item">
+                                            <span class="label">📅 Fecha:</span>
+                                            <span class="value">{{ cita.fecha|date:"d/m/Y" }} {{ cita.hora|time:"H:i" }}</span>
+                                        </div>
+                                        {% if cita.marca and cita.modelo %}
+                                            <div class="detalle-item">
+                                                <span class="label">🚙 Vehículo:</span>
+                                                <span class="value">{{ cita.marca.nombre }} {{ cita.modelo.nombre }}</span>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        <!-- Órdenes de Cafetería -->
+                                        {% if cita.ordenes_cafeteria.all %}
+                                            <div class="cafeteria-info">
+                                                <span class="label">☕ Cafetería:</span>
+                                                <span class="value">
+                                                    {{ cita.ordenes_cafeteria.count }} orden{{ cita.ordenes_cafeteria.count|pluralize:"es" }}
+                                                    (${{ cita.total_cafeteria }})
+                                                </span>
+                                            </div>
+                                            <div class="total-estimado">
+                                                <span class="label">💰 Total Estimado:</span>
+                                                <span class="value total-amount">
+                                                    ${{ cita.total_estimado|floatformat:2 }}
+                                                </span>
+                                            </div>
+                                        {% else %}
+                                            <div class="total-estimado">
+                                                <span class="label">💰 Total Estimado:</span>
+                                                <span class="value total-amount">${{ cita.servicio.precio }}</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="cita-acciones">
+                                        <a href="{% url 'dashboard_cita_detalle' cita.id %}" class="btn-info">
+                                            👁️ Ver Detalle
+                                        </a>
+                                        <a href="{% url 'factura_crear' cita.id %}" class="btn-success">
+                                            📄 Crear Factura
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <!-- FACTURAS EXISTENTES -->
+        <div class="facturas-section">
+            <div class="section-header">
+                <h2>📋 Facturas Existentes</h2>
+                <div class="badge-counter">
+                    <span class="counter">{{ facturas.count }}</span>
+                    <span>facturas</span>
+                </div>
+            </div>
+
+            {% if facturas %}
+                <div class="facturas-grid">
+                    {% for factura in facturas %}
+                        <div class="factura-card">
+                            <div class="factura-card-header">
+                                <div class="factura-numero">
+                                    <h3>{{ factura.numero_factura }}</h3>
+                                    <span class="factura-fecha">{{ factura.fecha_emision|date:"d/m/Y" }}</span>
+                                </div>
+                                
+                                <div class="factura-estado">
+                                    <span class="estado-{{ factura.estado }}">
+                                        {{ factura.get_estado_display }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="factura-card-body">
+                                <div class="factura-cliente">
+                                    <h4>👤 Cliente</h4>
+                                    <p>{{ factura.cliente_nombre }}</p>
+                                    {% if factura.cliente_telefono %}
+                                        <p>📞 {{ factura.cliente_telefono }}</p>
+                                    {% endif %}
+                                </div>
+
+                                <div class="factura-servicios">
+                                    <h4>🚗 Servicio</h4>
+                                    <p>{{ factura.cita.servicio.nombre }}</p>
+                                    <p>{{ factura.cita.fecha }} {{ factura.cita.hora }}</p>
+                                    {% if factura.cita.marca and factura.cita.modelo %}
+                                        <p>{{ factura.cita.marca.nombre }} {{ factura.cita.modelo.nombre }}</p>
+                                    {% endif %}
+                                </div>
+
+                                {% if factura.orden_cafeteria %}
+                                    <div class="factura-cafeteria">
+                                        <h4>☕ Cafetería</h4>
+                                        <p>{{ factura.orden_cafeteria.detalles.count }} productos</p>
+                                        <p>${{ factura.subtotal_cafeteria }}</p>
+                                    </div>
+                                {% endif %}
+
+                                <div class="factura-metodo">
+                                    <h4>💳 Método de Pago</h4>
+                                    <span class="metodo-pago metodo-{{ factura.metodo_pago }}">
+                                        {{ factura.get_metodo_pago_display }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="factura-card-footer">
+                                <div class="factura-total">
+                                    <span>Total:</span>
+                                    <span>${{ factura.total_factura }}</span>
+                                </div>
+                                
+                                <div class="factura-acciones">
+                                    <a href="{% url 'factura_detalle' factura.id %}" class="btn-primary">
+                                        📋 Ver Detalles
+                                    </a>
+                                    
+                                    {% if factura.estado == 'pagada' %}
+                                        <button onclick="window.print()" class="btn-secondary">
+                                            🖨️ Imprimir
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-facturas">
+                    <h2>📭 No hay facturas</h2>
+                    <p>Aún no se ha generado ninguna factura. Las facturas se crean cuando se finalizan las citas.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.facturas-list-page {
+    padding: 40px 0;
+    min-height: 100vh;
+    background: var(--bg-page);
+}
+
+.facturas-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.facturas-header h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.facturas-header p {
+    color: var(--text-secondary);
+    font-size: 18px;
+}
+
+/* Sección de Citas Pendientes */
+.citas-pendientes-section {
+    margin-bottom: 50px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 20px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.section-header h2 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 24px;
+}
+
+.badge-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: var(--accent-hover);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.counter {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.estado-grupo {
+    margin-bottom: 30px;
+}
+
+.estado-grupo h3 {
+    margin: 0 0 20px 0;
+    color: var(--text-primary);
+    font-size: 20px;
+    padding: 15px;
+    background: var(--bg-input);
+    border-radius: 8px;
+    border-left: 4px solid var(--accent);
+}
+
+/* Grid de Citas */
+.citas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 20px;
+}
+
+.cita-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.cita-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.cita-en-proceso {
+    border-left: 4px solid var(--warning-bg);
+}
+
+.cita-finalizada {
+    border-left: 4px solid var(--success-bg);
+}
+
+.cita-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.cita-info h4 {
+    margin: 0 0 5px 0;
+    color: var(--text-primary);
+    font-size: 18px;
+}
+
+.cita-info p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.cita-estado {
+    flex-shrink: 0;
+}
+
+.estado-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.estado-en-proceso { 
+    background: var(--warning-bg); 
+    color: var(--warning-text); 
+}
+
+.estado-finalizada { 
+    background: var(--success-bg); 
+    color: var(--success-text); 
+}
+
+.cita-detalles {
+    padding: 20px;
+}
+
+.detalle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.detalle-item .label {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.detalle-item .value {
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.cafeteria-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 15px 0;
+    padding: 10px;
+    background: var(--bg-input);
+    border-radius: 8px;
+}
+
+.total-estimado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-light);
+}
+
+.total-amount {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.cita-acciones {
+    padding: 20px;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    gap: 10px;
+}
+
+/* Facturas Grid */
+.facturas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+.factura-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.factura-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.factura-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.factura-numero h3 {
+    margin: 0 0 5px 0;
+    color: var(--text-primary);
+    font-size: 18px;
+}
+
+.factura-fecha {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.factura-estado {
+    flex-shrink: 0;
+}
+
+.estado-pendiente { background: var(--warning-bg); color: var(--text-primary); }
+.estado-emitida { background: var(--info-bg); color: var(--text-primary); }
+.estado-pagada { background: var(--success-bg); color: var(--text-primary); }
+.estado-cancelada { background: var(--error-bg); color: var(--text-primary); }
+
+.factura-card-body {
+    padding: 20px;
+}
+
+.factura-cliente,
+.factura-servicios,
+.factura-cafeteria,
+.factura-metodo {
+    margin-bottom: 20px;
+}
+
+.factura-cliente h4,
+.factura-servicios h4,
+.factura-cafeteria h4,
+.factura-metodo h4 {
+    margin: 0 0 10px 0;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.factura-cliente p,
+.factura-servicios p,
+.factura-cafeteria p {
+    margin: 0 0 5px 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.factura-cafeteria {
+    padding-top: 15px;
+    border-top: 1px solid var(--border-light);
+}
+
+.metodo-pago {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.metodo-efectivo { background: var(--success-bg); color: var(--text-primary); }
+.metodo-tarjeta { background: var(--info-bg); color: var(--text-primary); }
+.metodo-transferencia { background: var(--warning-bg); color: var(--text-primary); }
+.metodo-mixto { background: var(--accent); color: var(--accent-hover); }
+
+.factura-card-footer {
+    padding: 20px;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.factura-total {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.factura-total span:first-child {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.factura-total span:last-child {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.factura-acciones {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: var(--accent-hover);
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+    color: var(--accent);
+}
+
+.btn-success {
+    background: var(--success-bg);
+    color: var(--success-text);
+}
+
+.btn-success:hover {
+    opacity: 0.8;
+}
+
+.btn-info {
+    background: var(--info-bg);
+    color: var(--info-text);
+}
+
+.btn-info:hover {
+    opacity: 0.8;
+}
+
+.btn-secondary {
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--border-color);
+}
+
+.no-facturas {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.no-facturas h2 {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.no-facturas p {
+    font-size: 16px;
+    margin-bottom: 30px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .section-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .citas-grid,
+    .facturas-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .cita-header,
+    .factura-card-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .cita-acciones,
+    .factura-card-footer {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .cita-acciones .btn,
+    .factura-acciones .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,152 @@
+body {
+  background-color: var(--bg-page);
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-primary);
+}
+
+.container {
+  background: var(--bg-card);
+  padding: 30px;
+  border-radius: 18px;
+  max-width: 900px;
+  margin: 40px auto;
+  color: var(--text-primary);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border-color);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 26px;
+}
+
+p {
+  text-align: center;
+  margin-bottom: 25px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* ===== SERVICIOS ===== */
+.servicios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+/* Hacer toda la card clicable */
+.servicio-card {
+  background: var(--bg-input);
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.servicio-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  background: var(--bg-card);
+}
+
+[data-theme="light"] .servicio-card:hover {
+  border-color: var(--accent);
+}
+
+/* Estado seleccionado de la card */
+.servicio-card.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.servicio-card.selected h3,
+.servicio-card.selected .precio-line,
+.servicio-card.selected .desc {
+  color: var(--accent-hover);
+}
+
+/* Ocultar radio button pero mantener funcionalidad */
+.select-servicio {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.select-servicio input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.select-servicio span {
+  display: none;
+}
+
+/* ===== FORMULARIO ===== */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+form p {
+  margin: 0;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  font-size: 14px;
+  outline: none;
+  background: var(--bg-input);
+  color: var(--text-primary);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* ===== ALERTA ===== */
+.alerta {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+}

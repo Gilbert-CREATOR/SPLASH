@@ -1,0 +1,385 @@
+{% extends "layouts/app.html" %}
+{% load static %}
+
+{% block title %}Órdenes Activas · Cafetería{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cafeteria.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="ordenes-activas-page">
+    <div class="container">
+        <div class="ordenes-header">
+            <h1>📋 Órdenes Activas</h1>
+            <p>Gestiona las órdenes de la cafetería en tiempo real</p>
+        </div>
+
+        {% if ordenes %}
+            <div class="ordenes-grid">
+                {% for orden in ordenes %}
+                    <div class="orden-card estado-{{ orden.estado }}">
+                        <div class="orden-header">
+                            <div class="orden-info">
+                                <h3>Orden #{{ orden.id }}</h3>
+                                <p class="cliente-nombre">{{ orden.cliente_nombre }}</p>
+                                {% if orden.cliente_telefono %}
+                                    <p class="cliente-telefono">📞 {{ orden.cliente_telefono }}</p>
+                                {% endif %}
+                                <p class="orden-fecha">📅 {{ orden.fecha_hora|date:"H:i" }}</p>
+                            </div>
+                            
+                            <div class="orden-estado">
+                                <span class="estado-badge estado-{{ orden.estado }}">
+                                    {{ orden.get_estado_display }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="orden-detalles">
+                            <div class="detalles-header">
+                                <h4>🍽️ Detalles de la Orden</h4>
+                                <span class="total-items">{{ orden.cantidad_items }} items</span>
+                            </div>
+                            
+                            <div class="productos-list">
+                                {% for detalle in orden.detalles.all %}
+                                    <div class="producto-item">
+                                        <span class="producto-nombre">{{ detalle.cantidad }}x {{ detalle.producto.nombre }}</span>
+                                        <span class="producto-precio">${{ detalle.subtotal }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="orden-totales">
+                                <div class="total-line">
+                                    <span>Subtotal:</span>
+                                    <span>${{ orden.subtotal }}</span>
+                                </div>
+                                <div class="total-line">
+                                    <span>ITBIS:</span>
+                                    <span>${{ orden.impuesto }}</span>
+                                </div>
+                                <div class="total-line total-final">
+                                    <span>Total:</span>
+                                    <span>${{ orden.total }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if orden.notas %}
+                            <div class="orden-notas">
+                                <h4>📝 Notas:</h4>
+                                <p>{{ orden.notas }}</p>
+                            </div>
+                        {% endif %}
+
+                        <div class="orden-acciones">
+                            {% if orden.estado == 'pendiente' %}
+                                <a href="{% url 'cafeteria_cambiar_estado' orden.id 'en_preparacion' %}" 
+                                   class="btn-warning">
+                                    👨‍🍳 Iniciar Preparación
+                                </a>
+                            {% elif orden.estado == 'en_preparacion' %}
+                                <a href="{% url 'cafeteria_cambiar_estado' orden.id 'listo' %}" 
+                                   class="btn-success">
+                                    ✅ Marcar como Listo
+                                </a>
+                            {% elif orden.estado == 'listo' %}
+                                <a href="{% url 'cafeteria_cambiar_estado' orden.id 'entregado' %}" 
+                                   class="btn-primary">
+                                    📦 Entregar Orden
+                                </a>
+                            {% endif %}
+                            
+                            <a href="{% url 'cafeteria_orden_detalle' orden.id %}" 
+                               class="btn-info">
+                                📋 Ver Detalles
+                            </a>
+                            
+                            {% if orden.estado != 'entregado' %}
+                                <a href="{% url 'cafeteria_cambiar_estado' orden.id 'cancelado' %}" 
+                                   class="btn-danger"
+                                   onclick="return confirm('¿Estás seguro de cancelar esta orden?')">
+                                    ❌ Cancelar
+                                </a>
+                            {% endif %}
+                        </div>
+
+                        {% if orden.cita %}
+                            <div class="orden-cita">
+                                <span>🚗 Cita relacionada: {{ orden.cita.servicio.nombre }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-ordenes">
+                <h2>✅ No hay órdenes activas</h2>
+                <p>No hay órdenes pendientes, en preparación o listas para entregar.</p>
+                <a href="{% url 'cafeteria_menu' %}" class="btn-primary">
+                    ☕ Ver Menú de Cafetería
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.ordenes-activas-page {
+    padding: 40px 0;
+    min-height: 100vh;
+    background: var(--bg-page);
+}
+
+.ordenes-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.ordenes-header h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.ordenes-header p {
+    color: var(--text-secondary);
+    font-size: 18px;
+}
+
+.ordenes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 25px;
+}
+
+.orden-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.orden-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.estado-pendiente {
+    border-left: 4px solid var(--warning-bg);
+}
+
+.estado-en_preparacion {
+    border-left: 4px solid var(--info-bg);
+}
+
+.estado-listo {
+    border-left: 4px solid var(--success-bg);
+}
+
+.orden-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.orden-info h3 {
+    margin: 0 0 10px 0;
+    color: var(--text-primary);
+    font-size: 20px;
+}
+
+.cliente-nombre {
+    margin: 0 0 5px 0;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.cliente-telefono,
+.orden-fecha {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.estado-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.estado-pendiente { background: var(--warning-bg); color: var(--text-primary); }
+.estado-en_preparacion { background: var(--info-bg); color: var(--text-primary); }
+.estado-listo { background: var(--success-bg); color: var(--text-primary); }
+
+.orden-detalles {
+    padding: 20px;
+}
+
+.detalles-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.detalles-header h4 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 16px;
+}
+
+.total-items {
+    background: var(--bg-input);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.productos-list {
+    margin-bottom: 20px;
+}
+
+.producto-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.producto-nombre {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.producto-precio {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.orden-totales {
+    background: var(--bg-input);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.total-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.total-line:last-child {
+    margin-bottom: 0;
+}
+
+.total-final {
+    font-weight: 700;
+    color: var(--accent);
+    border-top: 1px solid var(--border-color);
+    padding-top: 8px;
+    margin-top: 8px;
+}
+
+.orden-notas {
+    padding: 0 20px 20px 20px;
+}
+
+.orden-notas h4 {
+    margin: 0 0 10px 0;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.orden-notas p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-style: italic;
+}
+
+.orden-acciones {
+    padding: 20px;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.orden-acciones .btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-warning { background: var(--warning-bg); color: var(--text-primary); }
+.btn-success { background: var(--success-bg); color: var(--text-primary); }
+.btn-primary { background: var(--accent); color: var(--accent-hover); }
+.btn-info { background: var(--info-bg); color: var(--text-primary); }
+.btn-danger { background: var(--error-bg); color: var(--text-primary); }
+
+.orden-cita {
+    padding: 15px 20px;
+    background: var(--bg-input);
+    border-top: 1px solid var(--border-light);
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.no-ordenes {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.no-ordenes h2 {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.no-ordenes p {
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+    .ordenes-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .orden-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .orden-acciones {
+        flex-direction: column;
+    }
+    
+    .orden-acciones .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

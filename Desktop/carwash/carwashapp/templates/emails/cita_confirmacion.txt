@@ -1,0 +1,33 @@
+CONFIRMACIÓN DE CITA - B&B CAR WASH
+=====================================
+
+¡Hola {{ nombre_cliente }}!
+
+Tu cita ha sido confirmada exitosamente. Estamos listos para darte el mejor servicio.
+
+DETALLES DE TU CITA:
+------------------
+Servicio: {{ servicio.nombre }}
+Fecha: {{ fecha_formateada }}
+Hora: {{ hora_formateada }}
+Precio: ${{ servicio.precio }}
+
+¿QUÉ NECESITAS LLEVAR?
+--------------------
+• Tu vehículo (por supuesto 😉)
+• Documentos del vehículo si los necesitas
+• Ganas de disfrutar de nuestro servicio premium
+
+RECOMENDACIONES:
+---------------
+• Llega 10 minutos antes de tu hora programada
+• Retira objetos de valor del vehículo
+• Si necesitas cancelar, avísanos con 24 horas de anticipación
+
+¡TE ESPERAMOS!
+-------------
+📞 Teléfono: (809) 123-4567
+📍 Dirección: Calle Principal #123, Santo Domingo
+🌐 www.bbcarwash.com
+
+Este es un mensaje automático. Por favor no respondas a este email.
