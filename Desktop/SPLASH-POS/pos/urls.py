@@ -1,0 +1,33 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.login_redirect, name='home'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('pos/', views.pos_view, name='pos'),
+    path('historial/', views.historial_ventas, name='historial'),
+    path('venta/<int:venta_id>/', views.detalle_venta, name='detalle_venta'),
+    path('productos/', views.gestion_productos, name='gestion_productos'),
+    path('productos/nuevo/', views.nuevo_producto, name='nuevo_producto'),
+    path('productos/editar/<int:producto_id>/', views.editar_producto, name='editar_producto'),
+    path('productos/eliminar/<int:producto_id>/', views.eliminar_producto, name='eliminar_producto'),
+    path('productos/toggle-estado/<int:producto_id>/', views.toggle_estado_producto, name='toggle_estado_producto'),
+    path('productos/edicion-masiva/', views.edicion_masiva_productos, name='edicion_masiva_productos'),
+    path('categorias/', views.gestion_categorias, name='gestion_categorias'),
+    path('categorias/crear/', views.crear_categoria, name='crear_categoria'),
+    path('categorias/editar/', views.editar_categoria, name='editar_categoria'),
+    path('categorias/eliminar/', views.eliminar_categoria, name='eliminar_categoria'),
+    path('api/procesar-venta/', views.procesar_venta, name='procesar_venta'),
+    path('api/buscar-producto/', views.buscar_producto, name='buscar_producto'),
+    path('api/productos/', views.api_productos, name='api_productos'),
+    path('api/productos/<int:producto_id>/', views.obtener_producto, name='obtener_producto'),
+    path('ganancias/', views.ganancias, name='ganancias'),
+    path('inventario/', views.inventario, name='inventario'),
+    path('recepcion-mercancia/', views.recepcion_mercancia, name='recepcion_mercancia'),
+    path('historial-cambios/', views.historial_cambios, name='historial_cambios'),
+    path('empleados/', views.gestion_empleados, name='gestion_empleados'),
+    path('empleados/crear/', views.crear_empleado, name='crear_empleado'),
+    path('empleados/editar/', views.editar_empleado, name='editar_empleado'),
+    path('empleados/toggle-estado/<int:empleado_id>/', views.toggle_estado_empleado, name='toggle_estado_empleado'),
+    path('empleados/eliminar/<int:empleado_id>/', views.eliminar_empleado, name='eliminar_empleado'),
+]

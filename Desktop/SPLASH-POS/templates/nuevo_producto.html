@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}Nuevo Producto - SPLASH POS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-plus me-2"></i> Nuevo Producto
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-box me-2"></i> Información del Producto
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre del Producto *</label>
+                                <input type="text" class="form-control" name="nombre" id="nombre" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="categoria" class="form-label">Categoría</label>
+                                <select class="form-select" name="categoria" id="categoria">
+                                    {% for categoria in categorias %}
+                                        <option value="{{ categoria }}">{{ categoria }}</option>
+                                    {% endfor %}
+                                    <option value="">-- Nueva Categoría --</option>
+                                </select>
+                                <div class="form-text">Selecciona una categoría existente o elige "Nueva Categoría" para crear una</div>
+                            </div>
+                            <div class="mb-3" id="nueva-categoria-container" style="display: none;">
+                                <label for="nueva-categoria" class="form-label">Nombre de Nueva Categoría</label>
+                                <input type="text" class="form-control" name="nueva_categoria" id="nueva-categoria" 
+                                       placeholder="Ej: Bebidas, Comidas, Snacks">
+                                <div class="form-text">Ingresa el nombre para la nueva categoría</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="precio_compra" class="form-label">Precio de Compra *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">RD$</span>
+                                    <input type="number" class="form-control" name="precio_compra" id="precio_compra" 
+                                           step="0.01" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="precio_venta" class="form-label">Precio de Venta *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">RD$</span>
+                                    <input type="number" class="form-control" name="precio_venta" id="precio_venta" 
+                                           step="0.01" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="stock" class="form-label">Stock Inicial *</label>
+                                <input type="number" class="form-control" name="stock" id="stock" 
+                                       step="0.01" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Preview de ganancia -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-chart-line me-2"></i> Preview de Rentabilidad</h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <strong>Ganancia Unitaria:</strong> 
+                                        <span id="ganancia-unitaria">RD$ 0.00</span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Margen:</strong> 
+                                        <span id="margen">0.0%</span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Ganancia Total:</strong> 
+                                        <span id="ganancia-total">RD$ 0.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i> Guardar Producto
+                        </button>
+                        <a href="{% url 'gestion_productos' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i> Ayuda
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6>Ganancia y Margen</h6>
+                <p class="text-muted">
+                    La ganancia se calcula automáticamente restando el precio de compra al precio de venta.
+                    El margen es el porcentaje de ganancia sobre el precio de venta.
+                </p>
+                
+                <h6>Ejemplo:</h6>
+                <ul class="text-muted">
+                    <li>Precio Compra: RD$ 100.00</li>
+                    <li>Precio Venta: RD$ 150.00</li>
+                    <li>Ganancia: RD$ 50.00</li>
+                    <li>Margen: 33.3%</li>
+                </ul>
+                
+                <h6>Stock</h6>
+                <p class="text-muted">
+                    Ingresa la cantidad inicial disponible. El stock disminuirá automáticamente con cada venta.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const precioCompraInput = document.getElementById('precio_compra');
+    const precioVentaInput = document.getElementById('precio_venta');
+    const stockInput = document.getElementById('stock');
+    const gananciaUnitariaSpan = document.getElementById('ganancia-unitaria');
+    const margenSpan = document.getElementById('margen');
+    const gananciaTotalSpan = document.getElementById('ganancia-total');
+    const categoriaSelect = document.getElementById('categoria');
+    const nuevaCategoriaContainer = document.getElementById('nueva-categoria-container');
+    const nuevaCategoriaInput = document.getElementById('nueva-categoria');
+    
+    // Manejar selección de categoría
+    categoriaSelect.addEventListener('change', function() {
+        if (this.value === '') {
+            // Se seleccionó "Nueva Categoría"
+            nuevaCategoriaContainer.style.display = 'block';
+            nuevaCategoriaInput.required = true;
+        } else {
+            // Se seleccionó una categoría existente
+            nuevaCategoriaContainer.style.display = 'none';
+            nuevaCategoriaInput.required = false;
+            nuevaCategoriaInput.value = '';
+        }
+    });
+    
+    function calcularGanancia() {
+        const precioCompra = parseFloat(precioCompraInput.value) || 0;
+        const precioVenta = parseFloat(precioVentaInput.value) || 0;
+        const stock = parseFloat(stockInput.value) || 0;
+        
+        const gananciaUnitaria = precioVenta - precioCompra;
+        const margen = precioVenta > 0 ? (gananciaUnitaria / precioVenta) * 100 : 0;
+        const gananciaTotal = gananciaUnitaria * stock;
+        
+        gananciaUnitariaSpan.textContent = `RD$ ${gananciaUnitaria.toFixed(2)}`;
+        margenSpan.textContent = `${margen.toFixed(1)}%`;
+        gananciaTotalSpan.textContent = `RD$ ${gananciaTotal.toFixed(2)}`;
+        
+        // Cambiar color según margen
+        if (margen < 20) {
+            margenSpan.className = 'text-danger';
+        } else if (margen < 40) {
+            margenSpan.className = 'text-warning';
+        } else {
+            margenSpan.className = 'text-success';
+        }
+    }
+    
+    precioCompraInput.addEventListener('input', calcularGanancia);
+    precioVentaInput.addEventListener('input', calcularGanancia);
+    stockInput.addEventListener('input', calcularGanancia);
+});
+</script>
+{% endblock %}

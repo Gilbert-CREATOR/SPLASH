@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block title %}Inventario - SPLASH POS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-warehouse me-2"></i> Control de Inventario
+        </h1>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Filtrar por Categoría</label>
+                        <select name="categoria" class="form-select" onchange="this.form.submit()">
+                            <option value="">Todas las categorías</option>
+                            {% for categoria in categorias %}
+                                <option value="{{ categoria }}" {% if categoria_filtro == categoria %}selected{% endif %}>
+                                    {{ categoria }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">&nbsp;</label>
+                        <div>
+                            <a href="{% url 'inventario' %}" class="btn btn-secondary">Limpiar Filtros</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas de Inventario -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title mb-0">Total Productos</h5>
+                        <h3 class="mb-0">{{ stats.total_productos }}</h3>
+                        <small>Activos: {{ stats.productos_activos }}</small>
+                    </div>
+                    <div class="fs-1 opacity-50">
+                        <i class="fas fa-box"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title mb-0">Stock Total</h5>
+                        <h3 class="mb-0">{{ stats.total_stock|floatformat:0 }}</h3>
+                        <small>Promedio: {{ stats.avg_stock|floatformat:1 }}</small>
+                    </div>
+                    <div class="fs-1 opacity-50">
+                        <i class="fas fa-cubes"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title mb-0">Valor Inventario</h5>
+                        <h3 class="mb-0">RD$ {{ valor_total_inventario|floatformat:0 }}</h3>
+                    </div>
+                    <div class="fs-1 opacity-50">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title mb-0">Stock Bajo</h5>
+                        <h3 class="mb-0">{{ productos_stock_bajo.count }}</h3>
+                        <small>&lt; 10 unidades</small>
+                    </div>
+                    <div class="fs-1 opacity-50">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                    </div>
+                    <div class="fs-1 opacity-50">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Inventario -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i> Estado del Inventario
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Stock Actual</th>
+                                <th>Precio Venta</th>
+                                <th>Valor Inventario</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for producto in productos %}
+                                <tr>
+                                    <td><strong>{{ producto.nombre }}</strong></td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ producto.categoria }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if producto.stock == 0 %}bg-danger{% elif producto.stock < 10 %}bg-warning{% else %}bg-success{% endif %}">
+                                            {{ producto.stock|floatformat:2 }}
+                                        </span>
+                                    </td>
+                                    <td>RD$ {{ producto.precio_venta|floatformat:2 }}</td>
+                                    <td>RD$ {{ producto.valor_inventario|floatformat:2 }}</td>
+                                    <td>
+                                        {% if producto.stock == 0 %}
+                                            <span class="badge bg-danger">Sin Stock</span>
+                                        {% elif producto.stock < 10 %}
+                                            <span class="badge bg-warning">Stock Bajo</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Normal</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'editar_producto' producto.id %}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit me-1"></i> Ajustar
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Movimientos Recientes -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i> Movimientos Recientes
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if movimientos %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Producto</th>
+                                    <th>Tipo</th>
+                                    <th>Cantidad</th>
+                                    <th>Stock Anterior</th>
+                                    <th>Stock Nuevo</th>
+                                    <th>Motivo</th>
+                                    <th>Usuario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for movimiento in movimientos %}
+                                    <tr>
+                                        <td>{{ movimiento.fecha|date:"d/m/Y H:i" }}</td>
+                                        <td>{{ movimiento.producto.nombre }}</td>
+                                        <td>
+                                            <span class="badge {% if movimiento.tipo == 'entrada' %}bg-success{% elif movimiento.tipo == 'salida' %}bg-danger{% else %}bg-warning{% endif %}">
+                                                {{ movimiento.get_tipo_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ movimiento.cantidad|floatformat:2 }}</td>
+                                        <td>{{ movimiento.stock_anterior|floatformat:2 }}</td>
+                                        <td>{{ movimiento.stock_nuevo|floatformat:2 }}</td>
+                                        <td>{{ movimiento.motivo|default:'-' }}</td>
+                                        <td>{{ movimiento.usuario.username|default:'-' }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No hay movimientos recientes</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

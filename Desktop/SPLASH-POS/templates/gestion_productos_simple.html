@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}Productos - SPLASH POS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-boxes me-2"></i> Productos
+            </h1>
+            <a href="{% url 'nuevo_producto' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> Nuevo Producto
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros Sencillos -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" name="buscar" 
+                               placeholder="Buscar producto..." value="{{ request.GET.buscar|default:'' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <select name="categoria" class="form-select">
+                            <option value="">Todas las categorías</option>
+                            {% for categoria in categorias %}
+                                <option value="{{ categoria }}" 
+                                        {% if request.GET.categoria == categoria %}selected{% endif %}>
+                                    {{ categoria }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="fas fa-search me-2"></i> Buscar
+                        </button>
+                        <a href="{% url 'gestion_productos' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i> Limpiar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Productos -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i> Lista de Productos
+                    <small class="text-muted">({{ productos.count }} productos)</small>
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if productos %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Categoría</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for producto in productos %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ producto.nombre }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ producto.categoria }}</span>
+                                        </td>
+                                        <td>
+                                            <strong>RD$ {{ producto.precio_venta|floatformat:2 }}</strong>
+                                            <br>
+                                            <small class="text-muted">Costo: RD$ {{ producto.precio_compra|floatformat:2 }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="{% if producto.stock <= 10 %}text-danger{% elif producto.stock <= 20 %}text-warning{% else %}text-success{% endif %}">
+                                                <strong>{{ producto.stock|floatformat:0 }}</strong>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if producto.activo %}bg-success{% else %}bg-danger{% endif %}">
+                                                {% if producto.activo %}Activo{% else %}Inactivo{% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="{% url 'editar_producto' producto.id %}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'toggle_estado_producto' producto.id %}" 
+                                                   class="btn btn-sm {% if producto.activo %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                                                    <i class="fas {% if producto.activo %}fa-eye-slash{% else %}fa-eye{% endif %}"></i>
+                                                </a>
+                                                <a href="{% url 'eliminar_producto' producto.id %}" 
+                                                   class="btn btn-sm btn-outline-danger"
+                                                   onclick="return confirm('¿Está seguro de eliminar este producto?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-box fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No hay productos</h4>
+                        <p class="text-muted">
+                            {% if request.GET.buscar or request.GET.categoria %}
+                                No hay productos que coincidan con tu búsqueda
+                            {% else %}
+                                Comienza agregando tu primer producto
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'nuevo_producto' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i> Agregar Producto
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas Rápidas -->
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <i class="fas fa-boxes fa-2x text-primary mb-2"></i>
+                <h5>Total Productos</h5>
+                <h3 class="text-primary">{{ total_productos }}</h3>
+                <small class="text-muted">{{ productos_activos }} activos</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <i class="fas fa-dollar-sign fa-2x text-success mb-2"></i>
+                <h5>Valor Inventario</h5>
+                <h3 class="text-success">RD$ {{ valor_inventario|floatformat:0 }}</h3>
+                <small class="text-muted">Stock total</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-warning">
+            <div class="card-body text-center">
+                <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                <h5>Stock Bajo</h5>
+                <h3 class="text-warning">{{ productos_stock_bajo.count }}</h3>
+                <small class="text-muted">Necesitan reabastecer</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

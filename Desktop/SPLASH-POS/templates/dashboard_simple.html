@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - SPLASH POS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-tachometer-alt me-2"></i> Panel Principal
+        </h1>
+    </div>
+</div>
+
+<!-- Tarjetas de Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                <h5 class="card-title">Ventas de Hoy</h5>
+                <h2>RD$ {{ total_ventas_hoy|floatformat:0 }}</h2>
+                <small>{{ numero_ventas_hoy }} ventas</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-line fa-2x mb-2"></i>
+                <h5 class="card-title">Ganancias</h5>
+                <h2>RD$ {{ ganancias_hoy|floatformat:0 }}</h2>
+                <small>Beneficio neto</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-box fa-2x mb-2"></i>
+                <h5 class="card-title">Productos</h5>
+                <h2>{{ productos_mas_vendidos|length }}</h2>
+                <small>Diferentes vendidos</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                <h5 class="card-title">Stock Bajo</h5>
+                <h2>{{ productos_stock_bajo.count }}</h2>
+                <small>Productos con poco stock</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones Rápidas -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i> Acciones Rápidas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'nuevo_producto' %}" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-plus me-2"></i> Nuevo Producto
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'recepcion_mercancia' %}" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-truck-loading me-2"></i> Recepción
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'pos' %}" class="btn btn-info btn-lg w-100">
+                            <i class="fas fa-cash-register me-2"></i> Vender
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'gestion_productos' %}" class="btn btn-secondary btn-lg w-100">
+                            <i class="fas fa-boxes me-2"></i> Productos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Productos Más Vendidos -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-fire me-2"></i> Más Vendidos Hoy
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if productos_mas_vendidos %}
+                    {% for producto in productos_mas_vendidos %}
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+                            <span>{{ producto.producto__nombre }}</span>
+                            <span class="badge bg-primary">{{ producto.total_vendido }} vendidos</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">No hay ventas hoy</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Productos con Stock Bajo -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Alertas de Stock
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if productos_stock_bajo %}
+                    {% for producto in productos_stock_bajo %}
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded border-danger">
+                            <span>{{ producto.nombre }}</span>
+                            <span class="badge bg-danger">{{ producto.stock|floatformat:0 }} unidades</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-success text-center">
+                        <i class="fas fa-check-circle me-2"></i>Todos los productos tienen stock adecuado
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ventas Recientes -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-receipt me-2"></i> Ventas Recientes
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if ventas_recientes %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>N° Venta</th>
+                                    <th>Fecha</th>
+                                    <th>Total</th>
+                                    <th>Método</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for venta in ventas_recientes %}
+                                    <tr>
+                                        <td><strong>{{ venta.numero_venta }}</strong></td>
+                                        <td>{{ venta.fecha|date:"d/m/Y H:i" }}</td>
+                                        <td>RD$ {{ venta.total|floatformat:2 }}</td>
+                                        <td>
+                                            <span class="badge {% if venta.metodo_pago == 'efectivo' %}bg-success{% else %}bg-info{% endif %}">
+                                                {{ venta.metodo_pago|title }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'detalle_venta' venta.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">No hay ventas recientes</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

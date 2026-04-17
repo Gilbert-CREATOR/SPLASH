@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Historial de Cambios - SPLASH POS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-history me-2"></i> Historial de Cambios
+            </h1>
+            <a href="{% url 'gestion_productos' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Volver a Productos
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i> Movimientos de Inventario Recientes
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if movimientos %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Producto</th>
+                                    <th>Tipo</th>
+                                    <th>Cantidad</th>
+                                    <th>Stock Anterior</th>
+                                    <th>Stock Nuevo</th>
+                                    <th>Motivo</th>
+                                    <th>Usuario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for movimiento in movimientos %}
+                                    <tr>
+                                        <td>{{ movimiento.fecha|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            <strong>{{ movimiento.producto.nombre }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ movimiento.producto.categoria }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if movimiento.tipo == 'entrada' %}bg-success{% elif movimiento.tipo == 'salida' %}bg-danger{% else %}bg-warning{% endif %}">
+                                                {{ movimiento.tipo|title }}
+                                            </span>
+                                        </td>
+                                        <td>{{ movimiento.cantidad|floatformat:2 }}</td>
+                                        <td>{{ movimiento.stock_anterior|floatformat:2 }}</td>
+                                        <td>{{ movimiento.stock_nuevo|floatformat:2 }}</td>
+                                        <td>
+                                            <small>{{ movimiento.motivo|default:"-" }}</small>
+                                        </td>
+                                        <td>{{ movimiento.usuario.username|default:"-" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No hay movimientos registrados</h4>
+                        <p class="text-muted">Los movimientos aparecerán aquí cuando realices ventas o ajustes de inventario</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i> Leyenda de Tipos de Movimiento
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-success me-2">Entrada</span>
+                            <span>Aumento de stock (compras, ajustes, etc.)</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-danger me-2">Salida</span>
+                            <span>Disminución de stock (ventas, mermas, etc.)</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-warning me-2">Ajuste</span>
+                            <span>Correcciones manuales de inventario</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

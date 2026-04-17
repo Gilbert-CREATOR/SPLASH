@@ -1,0 +1,456 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestión de Productos - SPLASH POS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-box me-2"></i> Gestión de Productos
+            </h1>
+            <div class="btn-group">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoProductoModal">
+                    <i class="fas fa-plus me-2"></i> Nuevo Producto
+                </button>
+                <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#edicionMasivaModal">
+                    <i class="fas fa-edit me-2"></i> Edición Masiva
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i> Lista de Productos
+                        </h5>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex gap-2">
+                            <input type="text" class="form-control" id="busquedaProducto" placeholder="Buscar producto...">
+                            <select class="form-select" id="filtroCategoria" style="max-width: 200px;">
+                                <option value="">Todas las categorías</option>
+                                {% for categoria in categorias %}
+                                    <option value="{{ categoria }}">{{ categoria }}</option>
+                                {% endfor %}
+                            </select>
+                            <button class="btn btn-secondary" onclick="limpiarFiltros()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped" id="tablaProductos">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                </th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Precio Compra</th>
+                                <th>Precio Venta</th>
+                                <th>Stock</th>
+                                <th>Ganancia</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for producto in productos %}
+                                <tr data-categoria="{{ producto.categoria }}" data-nombre="{{ producto.nombre|lower }}">
+                                    <td>
+                                        <input type="checkbox" class="producto-checkbox" value="{{ producto.id }}">
+                                    </td>
+                                    <td>
+                                        <strong>{{ producto.nombre }}</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ producto.categoria }}</span>
+                                    </td>
+                                    <td>RD$ {{ producto.precio_compra|floatformat:2 }}</td>
+                                    <td>RD$ {{ producto.precio_venta|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="{% if producto.stock <= 10 %}text-danger{% elif producto.stock <= 20 %}text-warning{% else %}text-success{% endif %}">
+                                            {{ producto.stock|floatformat:0 }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if producto.ganancia_unitaria <= 20 %}bg-danger{% elif producto.ganancia_unitaria <= 40 %}bg-warning{% else %}bg-success{% endif %}">
+                                            RD$ {{ producto.ganancia_unitaria|floatformat:2 }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if producto.activo %}bg-success{% else %}bg-danger{% endif %}">
+                                            {% if producto.activo %}Activo{% else %}Inactivo{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-warning" onclick="editarProducto({{ producto.id }})">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm {% if producto.activo %}btn-secondary{% else %}btn-success{% endif %}" 
+                                                    onclick="toggleEstado({{ producto.id }})">
+                                                <i class="fas {% if producto.activo %}fa-eye-slash{% else %}fa-eye{% endif %}"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="eliminarProducto({{ producto.id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% if productos %}
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Total: {{ total_productos }} productos | 
+                            <span class="text-success">{{ productos_activos }} activos</span> | 
+                            <span class="text-danger">{{ productos_inactivos }} inactivos</span>
+                        </small>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nuevo Producto -->
+<div class="modal fade" id="nuevoProductoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus me-2"></i> Nuevo Producto
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'nuevo_producto' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre del Producto *</label>
+                                <input type="text" class="form-control" name="nombre" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="categoria" class="form-label">Categoría</label>
+                                <select class="form-select" name="categoria" id="categoria">
+                                    {% for categoria in categorias %}
+                                        <option value="{{ categoria }}">{{ categoria }}</option>
+                                    {% endfor %}
+                                    <option value="">-- Nueva Categoría --</option>
+                                </select>
+                            </div>
+                            <div class="mb-3" id="nueva-categoria-container" style="display: none;">
+                                <label for="nueva_categoria" class="form-label">Nombre de Nueva Categoría</label>
+                                <input type="text" class="form-control" name="nueva_categoria" id="nueva_categoria" 
+                                       placeholder="Ej: Bebidas, Comidas, Snacks">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="precio_compra" class="form-label">Precio de Compra *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">RD$</span>
+                                    <input type="number" class="form-control" name="precio_compra" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="precio_venta" class="form-label">Precio de Venta *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">RD$</span>
+                                    <input type="number" class="form-control" name="precio_venta" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="stock" class="form-label">Stock Inicial *</label>
+                                <input type="number" class="form-control" name="stock" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i> Guardar Producto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edición Masiva -->
+<div class="modal fade" id="edicionMasivaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit me-2"></i> Edición Masiva de Productos
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'edicion_masiva_productos' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Selecciona los productos que deseas editar y luego elige la acción a realizar.
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Productos seleccionados: <span id="contadorSeleccionados">0</span></label>
+                        <input type="hidden" name="productos_seleccionados" id="productos_seleccionados">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="accion_masiva" class="form-label">Acción a realizar</label>
+                        <select class="form-select" name="accion_masiva" id="accion_masiva" onchange="mostrarOpcionesAccion()">
+                            <option value="">Selecciona una acción</option>
+                            <option value="cambiar_categoria">Cambiar categoría</option>
+                            <option value="cambiar_precio_venta">Cambiar precio de venta</option>
+                            <option value="ajustar_stock">Ajustar stock</option>
+                            <option value="activar_desactivar">Activar/Desactivar</option>
+                            <option value="eliminar">Eliminar productos</option>
+                        </select>
+                    </div>
+                    
+                    <div id="opciones_accion" style="display: none;">
+                        <!-- Opciones dinámicas según la acción -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnEjecutarAccion" disabled>
+                        <i class="fas fa-play me-2"></i> Ejecutar Acción
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Historial de Cambios -->
+<div class="modal fade" id="historialModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-history me-2"></i> Historial de Cambios
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="contenidoHistorial">
+                    <!-- Contenido dinámico -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Funciones de JavaScript para la gestión mejorada
+document.addEventListener('DOMContentLoaded', function() {
+    // Manejar selección de categoría
+    document.getElementById('categoria').addEventListener('change', function() {
+        const nuevaCategoriaContainer = document.getElementById('nueva-categoria-container');
+        if (this.value === '') {
+            nuevaCategoriaContainer.style.display = 'block';
+        } else {
+            nuevaCategoriaContainer.style.display = 'none';
+        }
+    });
+    
+    // Búsqueda y filtros
+    document.getElementById('busquedaProducto').addEventListener('input', filtrarProductos);
+    document.getElementById('filtroCategoria').addEventListener('change', filtrarProductos);
+    
+    // Actualizar contador de seleccionados
+    actualizarContadorSeleccionados();
+});
+
+function filtrarProductos() {
+    const busqueda = document.getElementById('busquedaProducto').value.toLowerCase();
+    const categoria = document.getElementById('filtroCategoria').value;
+    const filas = document.querySelectorAll('#tablaProductos tbody tr');
+    
+    filas.forEach(fila => {
+        const nombre = fila.dataset.nombre || '';
+        const filaCategoria = fila.dataset.categoria || '';
+        
+        const coincideBusqueda = nombre.includes(busqueda);
+        const coincideCategoria = !categoria || filaCategoria === categoria;
+        
+        fila.style.display = (coincideBusqueda && coincideCategoria) ? '' : 'none';
+    });
+}
+
+function limpiarFiltros() {
+    document.getElementById('busquedaProducto').value = '';
+    document.getElementById('filtroCategoria').value = '';
+    filtrarProductos();
+}
+
+function toggleSelectAll() {
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.producto-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAll.checked;
+    });
+    
+    actualizarContadorSeleccionados();
+}
+
+function actualizarContadorSeleccionados() {
+    const checkboxes = document.querySelectorAll('.producto-checkbox:checked');
+    const contador = document.getElementById('contadorSeleccionados');
+    const productosSeleccionados = document.getElementById('productos_seleccionados');
+    
+    contador.textContent = checkboxes.length;
+    
+    const ids = Array.from(checkboxes).map(cb => cb.value);
+    productosSeleccionados.value = ids.join(',');
+    
+    // Habilitar/deshabilitar botón de ejecutar
+    const btnEjecutar = document.getElementById('btnEjecutarAccion');
+    btnEjecutar.disabled = checkboxes.length === 0;
+}
+
+function mostrarOpcionesAccion() {
+    const accion = document.getElementById('accion_masiva').value;
+    const opcionesDiv = document.getElementById('opciones_accion');
+    
+    if (!accion) {
+        opcionesDiv.style.display = 'none';
+        return;
+    }
+    
+    let opcionesHTML = '';
+    
+    switch(accion) {
+        case 'cambiar_categoria':
+            opcionesHTML = `
+                <div class="mb-3">
+                    <label for="nueva_categoria_masiva" class="form-label">Nueva categoría</label>
+                    <select class="form-select" name="nueva_categoria_masiva" required>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria }}">{{ categoria }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            `;
+            break;
+        case 'cambiar_precio_venta':
+            opcionesHTML = `
+                <div class="mb-3">
+                    <label for="tipo_ajuste_precio" class="form-label">Tipo de ajuste</label>
+                    <select class="form-select" name="tipo_ajuste_precio" required>
+                        <option value="fijo">Precio fijo</option>
+                        <option value="porcentaje">Ajuste por porcentaje</option>
+                        <option value="margen">Definir margen (%)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="valor_ajuste" class="form-label">Valor</label>
+                    <input type="number" class="form-control" name="valor_ajuste" step="0.01" required>
+                </div>
+            `;
+            break;
+        case 'ajustar_stock':
+            opcionesHTML = `
+                <div class="mb-3">
+                    <label for="tipo_ajuste_stock" class="form-label">Tipo de ajuste</label>
+                    <select class="form-select" name="tipo_ajuste_stock" required>
+                        <option value="fijo">Cantidad fija</option>
+                        <option value="sumar">Sumar cantidad</option>
+                        <option value="restar">Restar cantidad</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="valor_stock" class="form-label">Valor</label>
+                    <input type="number" class="form-control" name="valor_stock" step="0.01" required>
+                </div>
+            `;
+            break;
+        case 'activar_desactivar':
+            opcionesHTML = `
+                <div class="mb-3">
+                    <label for="estado_producto" class="form-label">Estado</label>
+                    <select class="form-select" name="estado_producto" required>
+                        <option value="activar">Activar productos</option>
+                        <option value="desactivar">Desactivar productos</option>
+                    </select>
+                </div>
+            `;
+            break;
+        case 'eliminar':
+            opcionesHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>¡Cuidado!</strong> Esta acción eliminará permanentemente los productos seleccionados.
+                </div>
+            `;
+            break;
+    }
+    
+    opcionesDiv.innerHTML = opcionesHTML;
+    opcionesDiv.style.display = 'block';
+}
+
+function editarProducto(id) {
+    window.location.href = `/productos/editar/${id}/`;
+}
+
+function toggleEstado(id) {
+    window.location.href = `/productos/toggle-estado/${id}/`;
+}
+
+function eliminarProducto(id) {
+    if (confirm('¿Está seguro de eliminar este producto?')) {
+        window.location.href = `/productos/eliminar/${id}/`;
+    }
+}
+
+// Event listeners para checkboxes
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('producto-checkbox')) {
+        actualizarContadorSeleccionados();
+    }
+});
+</script>
+{% endblock %}

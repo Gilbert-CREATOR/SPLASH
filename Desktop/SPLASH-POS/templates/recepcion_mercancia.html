@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+
+{% block title %}Recepción de Mercancía - SPLASH POS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-truck-loading me-2"></i> Recepción de Mercancía
+        </h1>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-plus-circle me-2"></i> Ingresar Mercancía
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" id="recepcionForm">
+                    {% csrf_token %}
+                    
+                    <!-- Selección de Producto -->
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="producto" class="form-label">Producto *</label>
+                            <select class="form-select" name="producto" id="producto" required>
+                                <option value="">Selecciona un producto...</option>
+                                {% for p in productos %}
+                                    <option value="{{ p.id }}" 
+                                            data-stock="{{ p.stock }}"
+                                            data-nombre="{{ p.nombre }}"
+                                            data-precio="{{ p.precio_compra }}">
+                                        {{ p.nombre }} (Stock actual: {{ p.stock }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="categoria" class="form-label">Categoría</label>
+                            <input type="text" class="form-control" id="categoria" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Información del Producto -->
+                    <div class="row mb-3" id="infoProducto" style="display: none;">
+                        <div class="col-md-4">
+                            <label class="form-label">Stock Actual</label>
+                            <input type="text" class="form-control" id="stockActual" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Precio Compra</label>
+                            <input type="text" class="form-control" id="precioCompra" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Precio Venta</label>
+                            <input type="text" class="form-control" id="precioVenta" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Tipo de Ajuste -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="tipoAjuste" class="form-label">Tipo de Ajuste *</label>
+                            <select class="form-select" name="tipoAjuste" id="tipoAjuste" required>
+                                <option value="sumar">Sumar al stock actual</option>
+                                <option value="fijo">Establecer stock fijo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="cantidad" class="form-label">Cantidad *</label>
+                            <input type="number" class="form-control" name="cantidad" id="cantidad" 
+                                   step="0.01" min="0" required>
+                        </div>
+                    </div>
+
+                    <!-- Nuevo Stock Calculado -->
+                    <div class="row mb-3" id="nuevoStockContainer" style="display: none;">
+                        <div class="col-md-12">
+                            <label class="form-label">Nuevo Stock</label>
+                            <div class="input-group">
+                                <span class="input-group-text">📦</span>
+                                <input type="text" class="form-control" id="nuevoStock" readonly>
+                                <span class="input-group-text">unidades</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Motivo -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="motivo" class="form-label">Motivo / Nota</label>
+                            <textarea class="form-control" name="motivo" id="motivo" rows="3" 
+                                      placeholder="Ej: Compra a proveedor XYZ, factura #123"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Actualizar Stock
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">
+                                <i class="fas fa-times me-2"></i> Limpiar
+                            </button>
+                            <button type="button" class="btn btn-info" onclick="agregarOtro()">
+                                <i class="fas fa-plus me-2"></i> Agregar Otro
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Resumen del Día -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-chart-line me-2"></i> Resumen del Día
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <small class="text-muted">Productos actualizados hoy</small>
+                    <h5 class="mb-0">{{ resumen_dia.productos_actualizados }}</h5>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">Total unidades agregadas</small>
+                    <h5 class="mb-0">{{ resumen_dia.total_unidades }}</h5>
+                </div>
+                <div>
+                    <small class="text-muted">Valor de la mercancía</small>
+                    <h5 class="mb-0">RD$ {{ resumen_dia.valor_mercancia|floatformat:2 }}</h5>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ayuda Rápida -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-question-circle me-2"></i> Ayuda Rápida
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6>📦 Tipos de Ajuste:</h6>
+                    <small class="text-muted">
+                        <strong>Sumar:</strong> Aumenta el stock actual<br>
+                        <strong>Fijo:</strong> Establece una cantidad exacta
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <h6>💡 Consejos:</h6>
+                    <small class="text-muted">
+                        • Usa "Sumar" para nuevas compras<br>
+                        • Usa "Fijo" para inventario físico<br>
+                        • El motivo se guarda en el historial
+                    </small>
+                </div>
+                <div>
+                    <h6>⚡ Atajos:</h6>
+                    <small class="text-muted">
+                        • Tab para mover al siguiente campo<br>
+                        • Enter para enviar formulario<br>
+                        • Esc para limpiar formulario
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Historial Reciente -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i> Movimientos de Hoy
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if movimientos_hoy %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Hora</th>
+                                    <th>Producto</th>
+                                    <th>Tipo</th>
+                                    <th>Cantidad</th>
+                                    <th>Stock Resultante</th>
+                                    <th>Motivo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mov in movimientos_hoy %}
+                                    <tr>
+                                        <td>{{ mov.fecha|date:"H:i" }}</td>
+                                        <td>
+                                            <strong>{{ mov.producto.nombre }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ mov.producto.categoria }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">
+                                                {{ mov.tipo|title }}
+                                            </span>
+                                        </td>
+                                        <td>{{ mov.cantidad|floatformat:2 }}</td>
+                                        <td>{{ mov.stock_nuevo|floatformat:2 }}</td>
+                                        <td>
+                                            <small>{{ mov.motivo|default:"-" }}</small>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-3">
+                        <p class="text-muted">No hay movimientos de hoy</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const productoSelect = document.getElementById('producto');
+    const tipoAjuste = document.getElementById('tipoAjuste');
+    const cantidad = document.getElementById('cantidad');
+    const stockActual = document.getElementById('stockActual');
+    const nuevoStock = document.getElementById('nuevoStock');
+    const infoProducto = document.getElementById('infoProducto');
+    const nuevoStockContainer = document.getElementById('nuevoStockContainer');
+
+    productoSelect.addEventListener('change', function() {
+        const option = this.options[this.selectedIndex];
+        
+        if (option.value) {
+            // Mostrar información del producto
+            stockActual.value = option.dataset.stock;
+            document.getElementById('categoria').value = option.dataset.nombre.split(' - ')[0] || 'General';
+            document.getElementById('precioCompra').value = 'RD$ ' + parseFloat(option.dataset.precio).toFixed(2);
+            
+            // Buscar precio de venta
+            fetch(`/api/productos/${option.value}/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('precioVenta').value = 'RD$ ' + data.precio_venta.toFixed(2);
+                });
+            
+            infoProducto.style.display = 'block';
+            calcularNuevoStock();
+        } else {
+            limpiarFormulario();
+        }
+    });
+
+    tipoAjuste.addEventListener('change', calcularNuevoStock);
+    cantidad.addEventListener('input', calcularNuevoStock);
+
+    function calcularNuevoStock() {
+        const stockActualValor = parseFloat(stockActual.value) || 0;
+        const cantidadValor = parseFloat(cantidad.value) || 0;
+        const tipo = tipoAjuste.value;
+        
+        let nuevoStockValor = 0;
+        
+        if (tipo === 'sumar') {
+            nuevoStockValor = stockActualValor + cantidadValor;
+        } else if (tipo === 'fijo') {
+            nuevoStockValor = cantidadValor;
+        }
+        
+        nuevoStock.value = nuevoStockValor.toFixed(2);
+        nuevoStockContainer.style.display = 'block';
+    }
+
+    function limpiarFormulario() {
+        document.getElementById('recepcionForm').reset();
+        stockActual.value = '';
+        document.getElementById('categoria').value = '';
+        document.getElementById('precioCompra').value = '';
+        document.getElementById('precioVenta').value = '';
+        document.getElementById('motivo').value = '';
+        infoProducto.style.display = 'none';
+        nuevoStockContainer.style.display = 'none';
+    }
+
+    window.limpiarFormulario = limpiarFormulario;
+
+    function agregarOtro() {
+        // Simular envío y limpiar para agregar otro producto
+        const form = document.getElementById('recepcionForm');
+        const formData = new FormData(form);
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mostrar mensaje de éxito
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-success alert-dismissible fade show';
+                alert.innerHTML = `
+                    ${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.querySelector('.card-body').prepend(alert);
+                
+                // Limpiar formulario para siguiente producto
+                limpiarFormulario();
+                
+                // Actualizar resumen
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    window.agregarOtro = agregarOtro;
+
+    // Atajos de teclado
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            limpiarFormulario();
+        }
+    });
+});
+</script>
+{% endblock %}

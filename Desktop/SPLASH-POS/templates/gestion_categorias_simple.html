@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block title %}Categorías - SPLASH POS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-tags me-2"></i> Categorías
+            </h1>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevaCategoriaModal">
+                <i class="fas fa-plus me-2"></i> Nueva Categoría
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas de Categorías -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-tags fa-2x mb-2"></i>
+                <h5>Total Categorías</h5>
+                <h2>{{ categorias|length }}</h2>
+                <small>Diferentes categorías</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-boxes fa-2x mb-2"></i>
+                <h5>Productos Totales</h5>
+                <h2>{{ categorias|length|add:0 }}</h2>
+                <small>En todas las categorías</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-bar fa-2x mb-2"></i>
+                <h5>Promedio</h5>
+                <h2>1.0</h2>
+                <small>Productos por categoría</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Categorías -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i> Lista de Categorías
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if categorias %}
+                    <div class="row">
+                        {% for categoria in categorias %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card border h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="card-title">
+                                                    <i class="fas fa-tag me-2 text-primary"></i>
+                                                    {{ categoria.nombre }}
+                                                </h6>
+                                                <p class="text-muted mb-2">
+                                                    <strong>{{ categoria.cantidad }}</strong> productos
+                                                    {% if categoria.cantidad_inactivos > 0 %}
+                                                        <br>
+                                                        <small>{{ categoria.cantidad_inactivos }} inactivos</small>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-warning" 
+                                                        onclick="editarCategoria('{{ categoria.nombre|escapejs }}')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" 
+                                                        onclick="eliminarCategoria('{{ categoria.nombre|escapejs }}', {{ categoria.cantidad }})"
+                                                        {% if categoria.cantidad > 0 %}disabled{% endif %}>
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No hay categorías</h4>
+                        <p class="text-muted">Crea tu primera categoría para organizar tus productos</p>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevaCategoriaModal">
+                            <i class="fas fa-plus me-2"></i> Crear Categoría
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nueva Categoría -->
+<div class="modal fade" id="nuevaCategoriaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus me-2"></i> Nueva Categoría
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'crear_categoria' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre de la Categoría *</label>
+                        <input type="text" class="form-control" name="nombre" id="nombre" required
+                               placeholder="Ej: Bebidas, Comidas, Snacks">
+                        <div class="form-text">Esta categoría estará disponible para todos los productos</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i> Crear Categoría
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Categoría -->
+<div class="modal fade" id="editarCategoriaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit me-2"></i> Editar Categoría
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'editar_categoria' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombre_actual" class="form-label">Nombre Actual</label>
+                        <input type="text" class="form-control" name="nombre_actual" id="nombre_actual" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nombre_nuevo" class="form-label">Nuevo Nombre *</label>
+                        <input type="text" class="form-control" name="nombre_nuevo" id="nombre_nuevo" required>
+                        <div class="form-text">Esto cambiará la categoría en todos los productos asociados</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save me-2"></i> Actualizar Categoría
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Eliminar Categoría -->
+<div class="modal fade" id="eliminarCategoriaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-trash me-2"></i> Eliminar Categoría
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'eliminar_categoria' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>¡Cuidado!</strong> Esta acción eliminará la categoría y todos los productos asociados.
+                    </div>
+                    <div class="mb-3">
+                        <label for="nombre_eliminar" class="form-label">Nombre de la Categoría</label>
+                        <input type="text" class="form-control" name="nombre_eliminar" id="nombre_eliminar" readonly>
+                        <div class="form-text">Confirma el nombre de la categoría a eliminar</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i> Eliminar Categoría
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editarCategoria(nombre) {
+    document.getElementById('nombre_actual').value = nombre;
+    document.getElementById('nombre_nuevo').value = nombre;
+    const modal = new bootstrap.Modal(document.getElementById('editarCategoriaModal'));
+    modal.show();
+}
+
+function eliminarCategoria(nombre, cantidad) {
+    if (cantidad > 0) {
+        alert('No se puede eliminar una categoría que tiene ' + cantidad + ' productos asociados.');
+        return;
+    }
+    
+    document.getElementById('nombre_eliminar').value = nombre;
+    const modal = new bootstrap.Modal(document.getElementById('eliminarCategoriaModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

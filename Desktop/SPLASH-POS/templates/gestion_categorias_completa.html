@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestión de Categorías - SPLASH POS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-tags me-2"></i> Gestión de Categorías
+            </h1>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevaCategoriaModal">
+                <i class="fas fa-plus me-2"></i> Nueva Categoría
+            </button>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i> Categorías del Sistema
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if categorias %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Productos</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for categoria in categorias %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ categoria.nombre }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary">
+                                                {{ categoria.cantidad }} productos activos
+                                                {% if categoria.cantidad_total > categoria.cantidad %}
+                                                <small>({{ categoria.cantidad_total|add:"-"|add:categoria.cantidad }} inactivos)</small>
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button class="btn btn-sm btn-warning" 
+                                                        onclick="editarCategoria('{{ categoria.nombre }}')">
+                                                    <i class="fas fa-edit me-1"></i> Editar
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="eliminarCategoria('{{ categoria.nombre }}', {{ categoria.cantidad }})" {% if categoria.cantidad > 0 %}disabled{% endif %}>
+                                                    <i class="fas fa-trash me-1"></i> Eliminar
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if categorias %}
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Nota:</strong> Solo se pueden eliminar categorías que no tengan productos asociados. 
+                            Para eliminar una categoría con productos, primero reasigna o elimina los productos.
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No hay categorías</h4>
+                        <p class="text-muted">Comienza agregando tu primera categoría</p>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevaCategoriaModal">
+                            <i class="fas fa-plus me-2"></i> Nueva Categoría
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nueva Categoría -->
+<div class="modal fade" id="nuevaCategoriaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus me-2"></i> Nueva Categoría
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'crear_categoria' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre de la Categoría</label>
+                        <input type="text" class="form-control" name="nombre" id="nombre" 
+                               required placeholder="Ej: Bebidas, Comidas, Snacks">
+                        <div class="form-text">
+                            Este nombre aparecerá como botón en el punto de venta
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i> Crear Categoría
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Categoría -->
+<div class="modal fade" id="editarCategoriaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit me-2"></i> Editar Categoría
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" id="formEditarCategoria">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="nombre_actual" id="nombre_actual">
+                    <div class="mb-3">
+                        <label for="nombre_nuevo" class="form-label">Nuevo Nombre</label>
+                        <input type="text" class="form-control" name="nombre_nuevo" id="nombre_nuevo" 
+                               required placeholder="Ej: Bebidas, Comidas, Snacks">
+                        <div class="form-text">
+                            Esto cambiará el nombre en todos los productos asociados
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i> Actualizar Categoría
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Eliminar Categoría -->
+<div class="modal fade" id="eliminarCategoriaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-trash me-2"></i> Eliminar Categoría
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de eliminar la categoría <strong id="nombreCategoriaEliminar"></strong>?</p>
+                <p id="mensajeProductos"></p>
+            </div>
+            <form method="post" id="formEliminarCategoria">
+                {% csrf_token %}
+                <input type="hidden" name="nombre_eliminar" id="nombre_eliminar">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i> Eliminar Categoría
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editarCategoria(nombre) {
+    document.getElementById('nombre_actual').value = nombre;
+    document.getElementById('nombre_nuevo').value = nombre;
+    document.getElementById('formEditarCategoria').action = '/categorias/editar/';
+    var modal = new bootstrap.Modal(document.getElementById('editarCategoriaModal'));
+    modal.show();
+}
+
+function eliminarCategoria(nombre, cantidad) {
+    document.getElementById('nombre_eliminar').value = nombre;
+    document.getElementById('nombreCategoriaEliminar').textContent = nombre;
+    
+    if (cantidad > 0) {
+        document.getElementById('mensajeProductos').innerHTML = 
+            '<div class="alert alert-warning">No se puede eliminar porque tiene ' + cantidad + ' productos asociados.</div>';
+        document.getElementById('formEliminarCategoria').querySelector('button[type="submit"]').disabled = true;
+    } else {
+        document.getElementById('mensajeProductos').innerHTML = 
+            '<div class="alert alert-success">Esta categoría no tiene productos, puede eliminarse safely.</div>';
+        document.getElementById('formEliminarCategoria').querySelector('button[type="submit"]').disabled = false;
+    }
+    
+    document.getElementById('formEliminarCategoria').action = '/categorias/eliminar/';
+    var modal = new bootstrap.Modal(document.getElementById('eliminarCategoriaModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

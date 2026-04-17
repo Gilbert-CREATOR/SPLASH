@@ -1,0 +1,404 @@
+{% extends 'base.html' %}
+
+{% block title %}Empleados - SPLASH POS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-users me-2"></i> Empleados
+            </h1>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoEmpleadoModal">
+                <i class="fas fa-user-plus me-2"></i> Nuevo Empleado
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas de Empleados -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-users fa-2x mb-2"></i>
+                <h5>Total Empleados</h5>
+                <h2>{{ empleados.count }}</h2>
+                <small>Registrados en el sistema</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-user-check fa-2x mb-2"></i>
+                <h5>Empleados Activos</h5>
+                <h2>{{ empleados|length|add:-2 }}</h2>
+                <small>Pueden acceder al sistema</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+                <i class="fas fa-user-shield fa-2x mb-2"></i>
+                <h5>Administradores</h5>
+                <h2>1</h2>
+                <small>Con privilegios de admin</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Empleados -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i> Lista de Empleados
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if empleados %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Empleado</th>
+                                    <th>Usuario</th>
+                                    <th>Contraseña</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Último Acceso</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for empleado in empleados %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle bg-primary text-white me-3">
+                                                    {{ empleado.username.0|upper }}
+                                                </div>
+                                                <div>
+                                                    <strong>{{ empleado.get_full_name|default:empleado.username }}</strong>
+                                                    <br>
+                                                    <small class="text-muted">{{ empleado.email|default:'Sin email' }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <strong>{{ empleado.username }}</strong>
+                                        </td>
+                                        <td>
+                                            <code class="bg-light p-1 rounded">{{ empleado.password_display|default:"123456" }}</code>
+                                            <small class="text-muted">(contraseña actual)</small>
+                                        </td>
+                                        <td>
+                                            {% if empleado.is_staff %}
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-crown me-1"></i>Administrador
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-primary">
+                                                    <i class="fas fa-user me-1"></i>Empleado
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if empleado.is_active %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check me-1"></i>Activo
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">
+                                                    <i class="fas fa-times me-1"></i>Inactivo
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if empleado.last_login %}
+                                                <small>{{ empleado.last_login|date:"d/m/Y H:i" }}</small>
+                                            {% else %}
+                                                <small class="text-muted">Nunca</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-warning" 
+                                                        onclick="editarEmpleado('{{ empleado.id }}', '{{ empleado.username }}', '{{ empleado.email|default:''|escapejs }}', '{{ empleado.is_staff|yesno:'true,false' }}', '{{ empleado.is_active|yesno:'true,false' }}')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                {% if empleado.is_active %}
+                                                    <button class="btn btn-sm btn-outline-secondary" 
+                                                            onclick="toggleEstadoEmpleado('{{ empleado.id }}', '{{ empleado.username|escapejs }}')">
+                                                        <i class="fas fa-user-slash"></i>
+                                                    </button>
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-success" 
+                                                            onclick="toggleEstadoEmpleado('{{ empleado.id }}', '{{ empleado.username|escapejs }}')">
+                                                        <i class="fas fa-user-check"></i>
+                                                    </button>
+                                                {% endif %}
+                                                <button class="btn btn-sm btn-outline-danger" 
+                                                        onclick="eliminarEmpleado('{{ empleado.id }}', '{{ empleado.username|escapejs }}')"
+                                                        {% if empleado.is_staff %}disabled{% endif %}>
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No hay empleados registrados</h4>
+                        <p class="text-muted">Comienza agregando tu primer empleado</p>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoEmpleadoModal">
+                            <i class="fas fa-user-plus me-2"></i> Agregar Empleado
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nuevo Empleado -->
+<div class="modal fade" id="nuevoEmpleadoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-plus me-2"></i> Nuevo Empleado
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'crear_empleado' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label">Usuario *</label>
+                            <input type="text" class="form-control" name="username" id="username" required
+                                   placeholder="Ej: jperez" minlength="4">
+                            <div class="form-text">Nombre de usuario para iniciar sesión</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" id="email"
+                                   placeholder="Ej: jperez@empresa.com">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" name="first_name" id="first_name"
+                                   placeholder="Ej: Juan">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" name="last_name" id="last_name"
+                                   placeholder="Ej: Pérez">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="password" class="form-label">Contraseña *</label>
+                            <input type="text" class="form-control" name="password" id="password" required
+                                   placeholder="Ej: 123456" value="123456" minlength="8">
+                            <div class="form-text">Contraseña para el empleado (visible para administrador)</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="password_confirm" class="form-label">Confirmar Contraseña *</label>
+                            <input type="text" class="form-control" name="password_confirm" id="password_confirm" required
+                                   placeholder="Repite la contraseña" value="123456">
+                            <div class="form-text">Debe coincidir con la contraseña</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_staff" id="is_staff">
+                                <label class="form-check-label" for="is_staff">
+                                    <i class="fas fa-crown me-1"></i> Administrador
+                                </label>
+                                <div class="form-text">Tiene acceso a todas las funciones del sistema</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_active" id="is_active" checked>
+                                <label class="form-check-label" for="is_active">
+                                    <i class="fas fa-user-check me-1"></i> Activo
+                                </label>
+                                <div class="form-text">Puede acceder al sistema inmediatamente</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i> Crear Empleado
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Empleado -->
+<div class="modal fade" id="editarEmpleadoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit me-2"></i> Editar Empleado
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'editar_empleado' %}">
+                {% csrf_token %}
+                <input type="hidden" name="empleado_id" id="edit_empleado_id">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_username" class="form-label">Usuario *</label>
+                            <input type="text" class="form-control" name="username" id="edit_username" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_email" class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" id="edit_email">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_first_name" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" name="first_name" id="edit_first_name">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_last_name" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" name="last_name" id="edit_last_name">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_password" class="form-label">Contraseña Actual</label>
+                            <input type="text" class="form-control" name="password" id="edit_password"
+                                   placeholder="Dejar en blanco para no cambiar">
+                            <div class="form-text">Contraseña actual del empleado</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_password_confirm" class="form-label">Confirmar Contraseña</label>
+                            <input type="text" class="form-control" name="password_confirm" id="edit_password_confirm"
+                                   placeholder="Repite la contraseña">
+                            <div class="form-text">Solo si deseas cambiar la contraseña</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_staff" id="edit_is_staff">
+                                <label class="form-check-label" for="edit_is_staff">
+                                    <i class="fas fa-crown me-1"></i> Administrador
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_active" id="edit_is_active">
+                                <label class="form-check-label" for="edit_is_active">
+                                    <i class="fas fa-user-check me-1"></i> Activo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save me-2"></i> Actualizar Empleado
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+}
+</style>
+
+<script>
+function editarEmpleado(id, username, email, isStaff, isActive) {
+    document.getElementById('edit_empleado_id').value = id;
+    document.getElementById('edit_username').value = username;
+    document.getElementById('edit_email').value = email;
+    document.getElementById('edit_is_staff').checked = isStaff === 'true';
+    document.getElementById('edit_is_active').checked = isActive === 'true';
+    document.getElementById('edit_password').value = '';
+    document.getElementById('edit_password_confirm').value = '';
+    
+    const modal = new bootstrap.Modal(document.getElementById('editarEmpleadoModal'));
+    modal.show();
+}
+
+function toggleEstadoEmpleado(id, username) {
+    if (confirm('¿Está seguro de cambiar el estado del empleado "' + username + '"?')) {
+        window.location.href = '/empleados/toggle-estado/' + id + '/';
+    }
+}
+
+function eliminarEmpleado(id, username) {
+    if (confirm('¿Está seguro de eliminar al empleado "' + username + '"? Esta acción no se puede deshacer.')) {
+        window.location.href = '/empleados/eliminar/' + id + '/';
+    }
+}
+
+// Validación de contraseñas
+document.getElementById('password_confirm')?.addEventListener('input', function() {
+    const password = document.getElementById('password').value;
+    const confirm = this.value;
+    
+    if (password !== confirm) {
+        this.setCustomValidity('Las contraseñas no coinciden');
+    } else {
+        this.setCustomValidity('');
+    }
+});
+
+document.getElementById('edit_password_confirm')?.addEventListener('input', function() {
+    const password = document.getElementById('edit_password').value;
+    const confirm = this.value;
+    
+    if (password && password !== confirm) {
+        this.setCustomValidity('Las contraseñas no coinciden');
+    } else {
+        this.setCustomValidity('');
+    }
+});
+</script>
+{% endblock %}

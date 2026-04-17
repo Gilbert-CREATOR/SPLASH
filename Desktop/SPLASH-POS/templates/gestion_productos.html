@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestión de Productos - SPLASH POS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-box me-2"></i> Gestión de Productos
+        </h1>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <a href="{% url 'nuevo_producto' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i> Nuevo Producto
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i> Lista de Productos
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Precio Compra</th>
+                                <th>Precio Venta</th>
+                                <th>Stock</th>
+                                <th>Ganancia</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for producto in productos %}
+                                <tr>
+                                    <td><strong>{{ producto.nombre }}</strong></td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ producto.categoria }}</span>
+                                    </td>
+                                    <td>RD$ {{ producto.precio_compra|floatformat:2 }}</td>
+                                    <td>RD$ {{ producto.precio_venta|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="badge {% if producto.stock < 10 %}bg-danger{% elif producto.stock < 20 %}bg-warning{% else %}bg-success{% endif %}">
+                                            {{ producto.stock|floatformat:0 }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="text-success">
+                                            RD$ {{ producto.ganancia_unitaria|floatformat:2 }}
+                                            <small>({{ producto.margen_porcentaje|floatformat:1 }}%)</small>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if producto.activo %}
+                                            <span class="badge bg-success">Activo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactivo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'editar_producto' producto.id %}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit me-1"></i> Editar
+                                        </a>
+                                        <a href="{% url 'eliminar_producto' producto.id %}" 
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('¿Está seguro de eliminar este producto?')">
+                                            <i class="fas fa-trash me-1"></i> Eliminar
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Total Productos</h5>
+                <h3>{{ productos|length }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Productos Activos</h5>
+                <h3>{{ productos|length }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5 class="card-title">Stock Bajo</h5>
+                <h3>{{ productos|length }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">Categorías</h5>
+                <h3>{{ categorias|length }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

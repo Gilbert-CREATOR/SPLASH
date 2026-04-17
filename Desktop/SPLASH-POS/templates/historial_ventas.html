@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Historial de Ventas - SPLASH POS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-history me-2"></i> Historial de Ventas
+        </h1>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="btn-group" role="group">
+                    <a href="?filtro=hoy" class="btn {% if filtro_actual == 'hoy' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <i class="fas fa-calendar-day me-1"></i> Hoy
+                    </a>
+                    <a href="?filtro=ayer" class="btn {% if filtro_actual == 'ayer' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <i class="fas fa-calendar-minus me-1"></i> Ayer
+                    </a>
+                    <a href="?filtro=semana" class="btn {% if filtro_actual == 'semana' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <i class="fas fa-calendar-week me-1"></i> Esta Semana
+                    </a>
+                    <a href="?filtro=todos" class="btn {% if filtro_actual == 'todos' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <i class="fas fa-calendar-alt me-1"></i> Todos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Ventas -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i> Ventas
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if ventas %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Fecha</th>
+                                    <th>Usuario</th>
+                                    <th>Total</th>
+                                    <th>Método</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for venta in ventas %}
+                                    <tr>
+                                        <td><strong>{{ venta.numero_venta }}</strong></td>
+                                        <td>{{ venta.fecha|date:"d/m/Y H:i" }}</td>
+                                        <td>{{ venta.usuario.username }}</td>
+                                        <td>RD$ {{ venta.total|floatformat:2 }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ venta.metodo_pago|default:'secondary' }}">
+                                                {{ venta.get_metodo_pago_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'detalle_venta' venta.id %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye me-1"></i> Ver
+                                            </a>
+                                            <button class="btn btn-sm btn-success" onclick="imprimirTicket({{ venta.id }})">
+                                                <i class="fas fa-print me-1"></i> Imprimir
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Resumen -->
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Ventas</h5>
+                                    <h3>{{ ventas|length }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Monto Total</h5>
+                                    <h3>RD$ 0.00</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Promedio</h5>
+                                    <h3>RD$ 0.00</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No hay ventas en este período</h4>
+                        <p class="text-muted">No se encontraron ventas para el filtro seleccionado</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function imprimirTicket(ventaId) {
+    const url = `{% url 'detalle_venta' 0 %}`.replace('0', ventaId);
+    window.open(url + '?print=1', '_blank', 'width=400,height=600');
+}
+</script>
+{% endblock %}

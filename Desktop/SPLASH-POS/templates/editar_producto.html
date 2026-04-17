@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Producto - SPLASH POS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">
+            <i class="fas fa-edit me-2"></i> Editar Producto
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-box me-2"></i> Información del Producto
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre del Producto *</label>
+                                <input type="text" class="form-control" name="nombre" id="nombre" 
+                                       value="{{ producto.nombre }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="categoria" class="form-label">Categoría</label>
+                                <select class="form-select" name="categoria" id="categoria">
+                                    {% for categoria in categorias %}
+                                        <option value="{{ categoria }}" {% if categoria == producto.categoria %}selected{% endif %}>
+                                            {{ categoria }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Selecciona la categoría para este producto</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="precio_compra" class="form-label">Precio de Compra *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">RD$</span>
+                                    <input type="number" class="form-control" name="precio_compra" id="precio_compra" 
+                                           step="0.01" min="0" value="{{ producto.precio_compra }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="precio_venta" class="form-label">Precio de Venta *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">RD$</span>
+                                    <input type="number" class="form-control" name="precio_venta" id="precio_venta" 
+                                           step="0.01" min="0" value="{{ producto.precio_venta }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="stock" class="form-label">Stock Actual *</label>
+                                <input type="number" class="form-control" name="stock" id="stock" 
+                                       step="0.01" min="0" value="{{ producto.stock }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Estado -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="activo" id="activo" 
+                                       {% if producto.activo %}checked{% endif %}>
+                                <label class="form-check-label" for="activo">
+                                    Producto Activo (disponible para venta)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Preview de ganancia -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-chart-line me-2"></i> Preview de Rentabilidad</h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <strong>Ganancia Unitaria:</strong> 
+                                        <span id="ganancia-unitaria">RD$ {{ producto.ganancia_unitaria|floatformat:2 }}</span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Margen:</strong> 
+                                        <span id="margen">{{ producto.margen_porcentaje|floatformat:1 }}%</span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Ganancia Total:</strong> 
+                                        <span id="ganancia-total">RD$ {{ producto.ganancia_unitaria|floatformat:2 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i> Actualizar Producto
+                        </button>
+                        <a href="{% url 'gestion_productos' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i> Información Actual
+                </h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <td><strong>ID:</strong></td>
+                        <td>{{ producto.id }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Creado:</strong></td>
+                        <td>{{ producto.created_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Actualizado:</strong></td>
+                        <td>{{ producto.updated_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Estado:</strong></td>
+                        <td>
+                            {% if producto.activo %}
+                                <span class="badge bg-success">Activo</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactivo</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Advertencia
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-0">
+                    <strong>Atención:</strong> Si modificas el precio de compra o venta, 
+                    afectará los cálculos de ganancias para futuras ventas. Las ventas ya realizadas 
+                    mantendrán sus valores originales.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const precioCompraInput = document.getElementById('precio_compra');
+    const precioVentaInput = document.getElementById('precio_venta');
+    const stockInput = document.getElementById('stock');
+    const gananciaUnitariaSpan = document.getElementById('ganancia-unitaria');
+    const margenSpan = document.getElementById('margen');
+    const gananciaTotalSpan = document.getElementById('ganancia-total');
+    
+    function calcularGanancia() {
+        const precioCompra = parseFloat(precioCompraInput.value) || 0;
+        const precioVenta = parseFloat(precioVentaInput.value) || 0;
+        const stock = parseFloat(stockInput.value) || 0;
+        
+        const gananciaUnitaria = precioVenta - precioCompra;
+        const margen = precioVenta > 0 ? (gananciaUnitaria / precioVenta) * 100 : 0;
+        const gananciaTotal = gananciaUnitaria * stock;
+        
+        gananciaUnitariaSpan.textContent = `RD$ ${gananciaUnitaria.toFixed(2)}`;
+        margenSpan.textContent = `${margen.toFixed(1)}%`;
+        gananciaTotalSpan.textContent = `RD$ ${gananciaTotal.toFixed(2)}`;
+        
+        // Cambiar color según margen
+        if (margen < 20) {
+            margenSpan.className = 'text-danger';
+        } else if (margen < 40) {
+            margenSpan.className = 'text-warning';
+        } else {
+            margenSpan.className = 'text-success';
+        }
+    }
+    
+    precioCompraInput.addEventListener('input', calcularGanancia);
+    precioVentaInput.addEventListener('input', calcularGanancia);
+    stockInput.addEventListener('input', calcularGanancia);
+});
+</script>
+{% endblock %}
